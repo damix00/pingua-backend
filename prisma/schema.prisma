@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+// Application characters
+enum AppCharacter {
+  PINGUA // Our mascot
+
+  // Human characters for the AI
+  ANNA
+  JOSEPH
+  MICHAEL
+  PETER
+  DAVID
+}
+
+enum AppSections {
+  GREETINGS // Hello, Goodbye, etc.
+  NUMBERS // How much does this cost?, etc.
+  FOOD_DRINKS // What do you want to eat?, etc.
+  COLORS_SHAPES // What color is this?, etc.
+  DIRECTIONS // Where is the bathroom?, etc.
+  EMERGENCY // Help, fire, etc.
+  FAMILY_FRIENDS // Who is this?, etc.
+  OBJECTS // What is this?, table, room, etc.
+  DAILY_ROUTINES // Wake up, brush teeth, etc.
+  CLOTHING_SHOPPING // Can I try this on?, etc.
+  TRANSPORTATION // How do you get to work?, etc.
+  WEATHER // What is the weather like?, etc.
+  EMOTIONS // How are you feeling?
+  SOCIALIZE // What are you doing this weekend?, etc.
+  WORK_PROFESSIONS // What do you do?, I am a teacher, etc.
+  HOBBIES_FREE_TIME // What do you do in your free time?, etc.
+  HEALTH // Is there a doctor nearby?, etc.
+  FORMAL // Dear Sir/Madam, best regards
+  CULTURAL_EXPRESSIONS // Break the ice, piece of cake, etc.
+  SLANG // What's up?, etc.
+}
+
+model User {
+  id       String @id @map("_id") @db.ObjectId
+  email    String @unique
+  username String @unique
+  name     String
+  createdAt DateTime @default(now())
+
+  courses Course[]
+  aiConversations AIConversation[]
+}
+
+model Language {
+  id String @id @map("_id") @db.ObjectId
+  name String
+  language_code String
+  flag_img String
+  createdAt DateTime @default(now())
+
+  courses Course[]
+}
+
+model Course {
+  id String @id @map("_id") @db.ObjectId
+  languageId String @db.ObjectId
+  userId String @db.ObjectId
+  xp Int
+  level Int
+  
+  language Language @relation(fields: [languageId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  sections Section[]
+}
+
+model Section {
+  id String @id @map("_id") @db.ObjectId
+  courseId String @db.ObjectId
+  finished Boolean
+  accessible Boolean
+
+  course Course @relation(fields: [courseId], references: [id])
+}
+
+model AIConversation {
+  id String @id @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  character AppCharacter
+
+  // AI will extract key information from the conversation and store it here
+  // This is because it's not possible to fit the entire conversation in the prompt
+  // Plus, this will make it feel more like a real conversation
+  memories String[]
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  messages AIConversationMessage[]
+}
+
+enum MessageType {
+  TEXT
+  VOICE
+  IMAGE // The user can send an image and the AI can interpret it, using GPT-4
+}
+
+model AIConversationMessage {
+  id String @id @map("_id") @db.ObjectId
+  conversationId String @db.ObjectId
+  userMessage Boolean // If the user sent the message, or the AI
+  messageContent String
+  messageType MessageType
+  contentUrl String[] // If the message is an image or voice, the URL(s) will be stored here
+
+  createdAt DateTime @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id])
+}

@@ -1,0 +1,33 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "out/index.js",
+    "scripts": {
+        "dev": "concurrently \"tsc --watch\" \"tsc && nodemon out/index.js\"",
+        "start": "tsc && node out/index.js",
+        "clean": "rimraf out"
+    },
+    "dependencies": {
+        "cluster": "^0.7.7",
+        "colors": "^1.4.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "express-fileupload": "^1.5.1",
+        "firebase-admin": "^13.0.2",
+        "jsonwebtoken": "^9.0.2",
+        "openai": "^4.77.0",
+        "winston": "^3.17.0"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.0",
+        "@types/express-fileupload": "^1.5.1",
+        "@types/node": "^22.10.2",
+        "prisma": "^6.1.0",
+        "rimraf": "^6.0.1",
+        "tsx": "^4.19.2",
+        "typescript": "^5.7.2"
+    }
+}
