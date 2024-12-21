@@ -4,8 +4,8 @@
     "description": "",
     "main": "out/index.js",
     "scripts": {
-        "dev": "concurrently \"tsc --watch\" \"tsc && nodemon out/index.js\"",
-        "start": "tsc && node out/index.js",
+        "dev": "rimraf out && concurrently \"tsc --watch\" \"tsc && nodemon out/index.js\"",
+        "start": "rimraf out && tsc && node out/index.js",
         "clean": "rimraf out"
     },
     "dependencies": {

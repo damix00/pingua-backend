@@ -1,7 +1,6 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import routes from "./routes/exports";
 import cluster from "cluster";
 import os from "os";
 import fileUpload from "express-fileupload";
@@ -9,6 +8,7 @@ import { createServer } from "http";
 import logger from "./middleware/logger";
 import initFirebase from "./firebase/config";
 import userAgent from "./middleware/user-agent";
+import { routes } from "./routes/exports";
 
 // Load environment variables
 dotenv.config();
@@ -46,13 +46,17 @@ app.use(userAgent); // add user agent to request
 app.enable("trust proxy");
 
 for (const route of routes) {
-    const path = `/${route.path.replace("\\", "/")}`;
-
-    if (route.method === "all") {
-        app.all(path, route.handler);
-    }
-
-    app[route.method](path, route.handler);
+    app.use(route.path, [
+        (req: Request, res: Response, next: NextFunction) => {
+            if (route.method == "all") next();
+            else if (route.method == req.method.toLowerCase()) next();
+            else
+                res.status(405).json({
+                    message: "Method Not Allowed",
+                });
+        },
+        ...(Array.isArray(route.handler) ? route.handler : [route.handler]),
+    ]);
 }
 
 app.all("*", (req, res) => {
