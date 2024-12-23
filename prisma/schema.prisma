@@ -60,6 +60,24 @@ model User {
   aiConversations AIConversation[]
 }
 
+// Auth
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  CREATING // creating means that this verification code is being used to create a new user
+}
+
+model VerificationCode {
+  @@map("verification_codes")
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  ip        String?
+  code      String        @unique
+  email     String
+  status    VerificationStatus
+  createdAt DateTime      @default(now())
+}
+
 model Language {
   id String @id @map("_id") @db.ObjectId
   name String

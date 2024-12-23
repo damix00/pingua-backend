@@ -1,3 +1,5 @@
+import sendCode from "./v1/auth/email/send-code";
+
 export type route = {
     path: string;
     handler: any;
@@ -14,8 +16,8 @@ export type route = {
 
 export const routes: route[] = [
     {
-        path: "/v1/auth/signup",
-        handler: require("./v1/auth/signup.js").default,
+        path: "/v1/auth/email/send-code",
+        handler: sendCode,
         method: "post",
     },
 ];

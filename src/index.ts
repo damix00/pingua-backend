@@ -6,9 +6,11 @@ import os from "os";
 import fileUpload from "express-fileupload";
 import { createServer } from "http";
 import logger from "./middleware/logger";
-import initFirebase from "./firebase/config";
+import initFirebase from "./apis/firebase/config";
 import userAgent from "./middleware/user-agent";
 import { routes } from "./routes/exports";
+import * as resend from "./apis/resend/resend";
+import * as db from "./db/prisma";
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +22,12 @@ const PORT = process.env.PORT || 9500;
 
 // Initialize Firebase
 initFirebase();
+
+// Initialize Resend API
+resend.init();
+
+// Initialize Prisma
+db.initPrisma();
 
 // File upload handler
 app.use(

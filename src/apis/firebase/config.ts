@@ -5,7 +5,7 @@ import path from "path";
 export default async function initFirebase() {
     admin.initializeApp({
         credential: admin.credential.cert(
-            path.join(__dirname, "../../", "secrets", "firebase_admin.json")
+            path.join(__dirname, "../../../", "secrets", "firebase_admin.json")
         ),
     });
 }
