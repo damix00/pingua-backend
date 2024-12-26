@@ -1,4 +1,6 @@
 import sendCode from "./v1/auth/email/send-code";
+import verifyCode from "./v1/auth/email/verify";
+import register from "./v1/auth/register";
 
 export type route = {
     path: string;
@@ -18,6 +20,16 @@ export const routes: route[] = [
     {
         path: "/v1/auth/email/send-code",
         handler: sendCode,
+        method: "post",
+    },
+    {
+        path: "/v1/auth/email/verify",
+        handler: verifyCode,
+        method: "post",
+    },
+    {
+        path: "/v1/auth/register",
+        handler: register,
         method: "post",
     },
 ];

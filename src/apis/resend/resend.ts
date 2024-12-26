@@ -1,11 +1,12 @@
 import { Resend } from "resend";
 import fs from "fs";
 import path from "path";
+import config from "../../utils/config";
 
 export let resend: Resend;
 
 export function init() {
-    resend = new Resend(process.env.RESEND_API_KEY);
+    resend = new Resend(config.get("RESEND_API_KEY"));
 }
 
 export function generateTemplate(file: string, params: Record<string, string>) {

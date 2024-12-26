@@ -50,10 +50,12 @@ enum AppSections {
 }
 
 model User {
-  id       String @id @map("_id") @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   email    String @unique
   username String @unique
+  avatar   String?
   name     String
+  resetToken String @default(uuid()) // This will be used to log the user out of all devices
   createdAt DateTime @default(now())
 
   courses Course[]
@@ -76,41 +78,38 @@ model VerificationCode {
   email     String
   status    VerificationStatus
   createdAt DateTime      @default(now())
-}
-
-model Language {
-  id String @id @map("_id") @db.ObjectId
-  name String
-  language_code String
-  flag_img String
-  createdAt DateTime @default(now())
-
-  courses Course[]
+  expiresAt DateTime
 }
 
 model Course {
-  id String @id @map("_id") @db.ObjectId
-  languageId String @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
+  languageCode String // The language code of the course
+  appLanguageCode String // The language code of the app, so we can show the course in the user's language
   xp Int
   level Int
+  fluencyLevel Int
+  // In case we update the course, we can increment the version
+  // The user will still be on the old version, but new users will get the new version
+  version Int @default(1)
   
-  language Language @relation(fields: [languageId], references: [id])
   user User @relation(fields: [userId], references: [id])
   sections Section[]
 }
 
 model Section {
-  id String @id @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   courseId String @db.ObjectId
   finished Boolean
+  level Int
   accessible Boolean
+  section AppSections
 
   course Course @relation(fields: [courseId], references: [id])
 }
 
 model AIConversation {
-  id String @id @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
   character AppCharacter
 
@@ -132,7 +131,7 @@ enum MessageType {
 }
 
 model AIConversationMessage {
-  id String @id @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   conversationId String @db.ObjectId
   userMessage Boolean // If the user sent the message, or the AI
   messageContent String

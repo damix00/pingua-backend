@@ -11,23 +11,21 @@ import userAgent from "./middleware/user-agent";
 import { routes } from "./routes/exports";
 import * as resend from "./apis/resend/resend";
 import * as db from "./db/prisma";
+import config from "./utils/config";
 
 // Load environment variables
-dotenv.config();
+config.init();
 
 const app = express();
 const server = createServer(app);
 
-const PORT = process.env.PORT || 9500;
+const PORT = config.get("PORT") || 9500;
 
 // Initialize Firebase
 initFirebase();
 
 // Initialize Resend API
 resend.init();
-
-// Initialize Prisma
-db.initPrisma();
 
 // File upload handler
 app.use(
@@ -74,9 +72,8 @@ app.all("*", (req, res) => {
 });
 
 async function start() {
-    console.log("Connecting to database");
-    // await connection.connect();
-    console.log("Connected to database");
+    // Initialize Prisma
+    await db.initPrisma();
 
     server.listen(PORT, () => {
         console.log(`Server is running in http://localhost:${PORT}`);
@@ -86,10 +83,7 @@ async function start() {
 if (cluster.isMaster) {
     for (
         let i = 0;
-        i <
-        (process.env?.PRODUCTION_MODE?.toString() == "true"
-            ? os.cpus().length
-            : 1);
+        i < (config.getBoolean("PRODUCTION_MODE") ? os.cpus().length : 1);
         i++
     ) {
         cluster.fork();
