@@ -7,5 +7,8 @@ export function toAuthUser(user: User) {
         username: user.username,
         name: user.name,
         email: user.email,
+        xp: user.xp,
+        plan: user.plan,
+        planExpiresAt: user.planExpiresAt,
     };
 }
