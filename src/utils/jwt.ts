@@ -11,7 +11,21 @@ export async function sign(payload: any): Promise<string> {
 }
 
 export async function verify(token: string): Promise<any> {
-    return jwt.verify(token, secret);
+    try {
+        return jwt.verify(token, secret);
+    } catch (error) {
+        console.error(error);
+
+        return null;
+    }
+}
+
+export async function verifyUser(token: string): Promise<{
+    id: string;
+    email: string;
+    resetToken: string;
+} | null> {
+    return await verify(token);
 }
 
 export async function signUser(user: User): Promise<string> {

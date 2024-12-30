@@ -1,5 +1,7 @@
 import sendCode from "./v1/auth/email/send-code";
 import verifyCode from "./v1/auth/email/verify";
+import me from "./v1/auth/me";
+import refreshToken from "./v1/auth/refresh-token";
 import register from "./v1/auth/register";
 
 export type route = {
@@ -30,6 +32,16 @@ export const routes: route[] = [
     {
         path: "/v1/auth/register",
         handler: register,
+        method: "post",
+    },
+    {
+        path: "/v1/auth/me",
+        handler: me,
+        method: "get",
+    },
+    {
+        path: "/v1/auth/refresh-token",
+        handler: refreshToken,
         method: "post",
     },
 ];

@@ -1,11 +1,10 @@
 import { Response } from "express";
 import { ExtendedRequest } from "../../../types/request";
 import { prisma } from "../../../db/prisma";
-import { AppSections, VerificationStatus } from "@prisma/client";
+import { VerificationStatus } from "@prisma/client";
 import { signUser } from "../../../utils/jwt";
 import { toAuthUser } from "../../../db/transformators/user";
 import { isSupportedLanguage } from "../../../db/languages";
-import { getSection } from "../../../utils/leveling";
 
 async function checkCode(id: string, email: string): Promise<boolean> {
     try {
@@ -127,7 +126,6 @@ export default async function register(req: ExtendedRequest, res: Response) {
                     finished: false,
                     level: 1,
                     accessible: true,
-                    section: getSection(1),
                 },
             ],
         });

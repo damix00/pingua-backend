@@ -26,29 +26,6 @@ enum AppCharacter {
   DAVID
 }
 
-enum AppSections {
-  GREETINGS // Hello, Goodbye, etc.
-  NUMBERS // How much does this cost?, etc.
-  FOOD_DRINKS // What do you want to eat?, etc.
-  COLORS_SHAPES // What color is this?, etc.
-  DIRECTIONS // Where is the bathroom?, etc.
-  EMERGENCY // Help, fire, etc.
-  FAMILY_FRIENDS // Who is this?, etc.
-  OBJECTS // What is this?, table, room, etc.
-  DAILY_ROUTINES // Wake up, brush teeth, etc.
-  CLOTHING_SHOPPING // Can I try this on?, etc.
-  TRANSPORTATION // How do you get to work?, etc.
-  WEATHER // What is the weather like?, etc.
-  EMOTIONS // How are you feeling?
-  SOCIALIZE // What are you doing this weekend?, etc.
-  WORK_PROFESSIONS // What do you do?, I am a teacher, etc.
-  HOBBIES_FREE_TIME // What do you do in your free time?, etc.
-  HEALTH // Is there a doctor nearby?, etc.
-  FORMAL // Dear Sir/Madam, best regards
-  CULTURAL_EXPRESSIONS // Break the ice, piece of cake, etc.
-  SLANG // What's up?, etc.
-}
-
 enum Plan {
   FREE
   BASIC
@@ -105,17 +82,60 @@ model Course {
   
   user User @relation(fields: [userId], references: [id])
   sections Section[]
+  questions UnitQuestions[]
 }
 
 model Section {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   courseId String @db.ObjectId
-  finished Boolean
+  finished Boolean // Index this so we can quickly get the unfinished section
   level Int
   accessible Boolean
-  section AppSections
 
   course Course @relation(fields: [courseId], references: [id])
+  questions UnitQuestions[]
+  
+  @@index([finished])
+}
+
+model UnitQuestions {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  courseId String @db.ObjectId
+  sectionId String @db.ObjectId
+  xp Int
+
+  course Course @relation(fields: [courseId], references: [id])
+  section Section @relation(fields: [sectionId], references: [id])
+}
+
+enum QuestionType {
+  TEXT
+  AUDIO_REPEAT
+  AUDIO_TRANSCRIBE
+  AUDIO_TRANSLATE
+  READ_ALOUD
+}
+
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Question {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  question String
+  answer String
+  xp Int
+  level Int
+  languageCode String
+  appLanguageCode String
+  type QuestionType
+  difficulty QuestionDifficulty
+  image String?
+  audio String?
+  video String?
+  createdAt DateTime @default(now())
 }
 
 model AIConversation {
