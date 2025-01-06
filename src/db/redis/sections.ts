@@ -20,6 +20,10 @@ export async function getSectionByLevel(level: number): Promise<
 }
 
 export async function setSection(section: CMSSection & { unitCount: number }) {
-    await redis.set(`section:${section.level}`, JSON.stringify(section));
-    await redis.set(`section:${section.id}`, JSON.stringify(section));
+    await redis.set(`section:${section.level}`, JSON.stringify(section), {
+        EX: 60 * 60 * 6, // 6H
+    });
+    await redis.set(`section:${section.id}`, JSON.stringify(section), {
+        EX: 60 * 60 * 6, // 6H
+    });
 }
