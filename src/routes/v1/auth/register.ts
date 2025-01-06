@@ -3,8 +3,9 @@ import { ExtendedRequest } from "../../../types/request";
 import { prisma } from "../../../db/prisma";
 import { VerificationStatus } from "@prisma/client";
 import { signUser } from "../../../utils/jwt";
-import { toAuthUser } from "../../../db/transformators/user";
+import { toAuthCourse, toAuthUser } from "../../../db/transformators/user";
 import { isSupportedLanguage } from "../../../db/languages";
+import { getSectionByLevel } from "../../../db/redis/sections";
 
 async function checkCode(id: string, email: string): Promise<boolean> {
     try {
@@ -119,15 +120,13 @@ export default async function register(req: ExtendedRequest, res: Response) {
             },
         });
 
-        const sections = await prisma.section.createMany({
-            data: [
-                {
-                    courseId: course.id,
-                    finished: false,
-                    level: 1,
-                    accessible: true,
-                },
-            ],
+        const sections = await prisma.section.create({
+            data: {
+                courseId: course.id,
+                finished: false,
+                level: 1,
+                accessible: true,
+            },
         });
 
         await prisma.verificationCode.deleteMany({
@@ -142,11 +141,12 @@ export default async function register(req: ExtendedRequest, res: Response) {
             jwt,
             user: toAuthUser(user),
             courses: [
-                {
+                toAuthCourse({
                     ...course,
-                    sections,
-                },
+                    section: sections,
+                }),
             ],
+            section_data: await getSectionByLevel(1),
         });
     } catch (error) {
         console.error(error);

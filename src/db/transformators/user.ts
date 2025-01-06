@@ -13,7 +13,7 @@ export function toAuthUser(user: User) {
     };
 }
 
-export function toAuthCourse(course: Course & { sections: Section[] }) {
+export function toAuthCourse(course: Course & { section: Section }) {
     return {
         id: course.id,
         languageCode: course.languageCode,
@@ -21,11 +21,11 @@ export function toAuthCourse(course: Course & { sections: Section[] }) {
         xp: course.xp,
         level: course.level,
         fluencyLevel: course.fluencyLevel,
-        sections: course.sections.map((section) => ({
-            id: section.id,
-            finished: section.finished,
-            level: section.level,
-            accessible: section.accessible,
-        })),
+        section: {
+            id: course.section.id,
+            finished: course.section.finished,
+            level: course.section.level,
+            accessible: course.section.accessible,
+        },
     };
 }

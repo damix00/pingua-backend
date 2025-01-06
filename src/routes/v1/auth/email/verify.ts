@@ -1,9 +1,10 @@
 import { Response } from "express";
 import { ExtendedRequest } from "../../../../types/request";
-import { Course, User, VerificationStatus } from "@prisma/client";
+import { Course, Section, User, VerificationStatus } from "@prisma/client";
 import { prisma } from "../../../../db/prisma";
 import { signUser } from "../../../../utils/jwt";
-import { toAuthUser } from "../../../../db/transformators/user";
+import { toAuthCourse, toAuthUser } from "../../../../db/transformators/user";
+import { getSectionByLevel } from "../../../../db/redis/sections";
 
 async function verify(
     email: string,
@@ -88,21 +89,47 @@ export default async function verifyCode(req: ExtendedRequest, res: Response) {
             });
         }
 
-        let courses: Course[] = [];
+        let courses: (Course & {
+            sections: Section[];
+        })[] = [];
 
         if (result.user) {
             courses = await prisma.course.findMany({
                 where: {
                     userId: result.user.id,
                 },
+                include: {
+                    sections: {
+                        where: {
+                            finished: false,
+                        },
+                    },
+                },
+            });
+        }
+
+        const sections = [];
+
+        for (const course of courses) {
+            const section = await getSectionByLevel(course.level);
+
+            sections.push({
+                course_id: course.id,
+                ...section,
             });
         }
 
         return res.status(200).json({
             user: result.user && toAuthUser(result.user),
-            courses,
+            courses: courses.map((course) =>
+                toAuthCourse({
+                    ...course,
+                    section: course.sections[0],
+                })
+            ),
             jwt: result.jwt,
             id: result.id,
+            section_data: sections,
         });
     } catch (error) {
         console.error(error);

@@ -46,7 +46,10 @@ export async function authorize(
         }
 
         req.user = user;
-        req.courses = user.courses;
+        req.courses = user.courses.map((course) => ({
+            ...course,
+            section: course.sections[0],
+        }));
 
         next();
     } catch (error) {

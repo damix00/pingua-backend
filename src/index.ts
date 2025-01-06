@@ -12,6 +12,7 @@ import { routes } from "./routes/exports";
 import * as resend from "./apis/resend/resend";
 import * as db from "./db/prisma";
 import config from "./utils/config";
+import { initRedis } from "./db/redis/redis";
 
 // Load environment variables
 config.init();
@@ -72,6 +73,7 @@ app.all("*", (req, res) => {
 });
 
 async function start() {
+    await initRedis();
     // Initialize Prisma
     await db.initPrisma();
 

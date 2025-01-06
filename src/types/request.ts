@@ -7,6 +7,6 @@ export interface ExtendedRequest extends Request {
     user: User;
     jwt: string;
     courses: (Course & {
-        sections: Section[];
+        section: Section;
     })[];
 }

@@ -34,19 +34,24 @@ enum Plan {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  email    String @unique
-  username String @unique
-  avatar   String?
-  name     String
-  xp       Int @default(0) // Account level XP (sum of all course XP) - used for competing with friends
-  plan     Plan @default(FREE)
-  planExpiresAt DateTime? // If the user has a plan, this will be set
-  resetToken String @default(uuid()) // This will be used to log the user out of all devices
-  createdAt DateTime @default(now())
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  email            String    @unique
+  username         String    @unique
+  avatar           String?
+  name             String
+  xp               Int       @default(0)
+  plan             Plan      @default(FREE)
+  planExpiresAt    DateTime?
+  resetToken       String    @default(uuid())
+  createdAt        DateTime  @default(now())
 
-  courses Course[]
-  aiConversations AIConversation[]
+  // Fields for daily streak tracking
+  currentStreak    Int       @default(0)
+  longestStreak    Int       @default(0)
+  lastStreakUpdate DateTime?
+
+  courses          Course[]
+  aiConversations  AIConversation[]
 }
 
 // Auth
@@ -58,7 +63,6 @@ enum VerificationStatus {
 }
 
 model VerificationCode {
-  @@map("verification_codes")
   id        String        @id @default(auto()) @map("_id") @db.ObjectId
   ip        String?
   code      String        @unique
@@ -109,11 +113,12 @@ model UnitQuestions {
 }
 
 enum QuestionType {
-  TEXT
-  AUDIO_REPEAT
-  AUDIO_TRANSCRIBE
-  AUDIO_TRANSLATE
-  READ_ALOUD
+  Flashcard
+  MultipleChoice
+  ListenAndWrite
+  ListenAndChoose
+  RecordVoice
+  Translate
 }
 
 enum QuestionDifficulty {
