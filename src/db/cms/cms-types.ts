@@ -5,19 +5,30 @@ export enum CMSQuestionType {
     ListenAndChoose = "listen-and-choose",
     RecordVoice = "record-voice",
     Translate = "translate",
+    TrueOrFalse = "true-or-false",
 }
+
+export enum AppCharacter {
+    Penguin = "penguin",
+    Glorp = "glorp",
+    Fujio = "fujio",
+    Jaxon = "jaxon",
+    Sara = "sara",
+}
+
+export type CMSCharacter = "user" | "narrator" | AppCharacter;
 
 export type CMSUnitStory = {
     id: string;
     title: string;
     dialogue: {
         id: string;
-        character: string;
+        character: CMSCharacter;
         text: string;
         answers: {
             id: string;
-            text: string;
-            correct: string;
+            answer: string;
+            correct: boolean;
         }[];
     }[];
 };
@@ -25,17 +36,17 @@ export type CMSUnitStory = {
 export type CMSQuestionFlashcard = {
     id: string;
     question: string;
-    type: CMSQuestionType.Flashcard;
+    questionType: CMSQuestionType.Flashcard;
     correctAnswer: string;
 };
 
 export type CMSQuestionMultipleChoice = {
     id: string;
     question: string;
-    type: CMSQuestionType.MultipleChoice;
+    questionType: CMSQuestionType.MultipleChoice;
     answers: {
         id: string;
-        text: string;
+        answer: string;
         correct: boolean;
     }[];
 };
@@ -43,7 +54,7 @@ export type CMSQuestionMultipleChoice = {
 export type CMSQuestionListenAndWrite = {
     id: string;
     question: string;
-    type: CMSQuestionType.ListenAndWrite;
+    questionType: CMSQuestionType.ListenAndWrite;
     audio: string;
     correctAnswer: string;
 };
@@ -51,11 +62,11 @@ export type CMSQuestionListenAndWrite = {
 export type CMSQuestionListenAndChoose = {
     id: string;
     question: string;
-    type: CMSQuestionType.ListenAndChoose;
+    questionType: CMSQuestionType.ListenAndChoose;
     audio: string;
     answers: {
         id: string;
-        text: string;
+        answer: string;
         correct: boolean;
     }[];
 };
@@ -63,15 +74,17 @@ export type CMSQuestionListenAndChoose = {
 export type CMSQuestionRecordVoice = {
     id: string;
     question: string;
-    type: CMSQuestionType.RecordVoice;
+    questionType: CMSQuestionType.RecordVoice;
 };
 
 export type CMSQuestionTranslate = {
     id: string;
     question: string;
-    type: CMSQuestionType.Translate;
+    questionType: CMSQuestionType.Translate;
     correctAnswer: string;
 };
+
+export type CMSQuestionTrueOrFalse = CMSQuestionMultipleChoice;
 
 export type CMSQuestion =
     | CMSQuestionMultipleChoice
@@ -80,6 +93,7 @@ export type CMSQuestion =
     | CMSQuestionListenAndChoose
     | CMSQuestionRecordVoice
     | CMSQuestionTranslate
+    | CMSQuestionTrueOrFalse
     | {
           id: string;
           isVariation: boolean;
@@ -130,60 +144,66 @@ export function transformSection(section: CMSSection): any {
 }
 
 export function transformQuestion(question: CMSQuestion): any {
-    if ("isVariation" in question && question.isVariation) {
-        return {
-            id: question.id,
-            isVariation: question.isVariation,
-            variations: question.variations.map((variation) =>
-                // @ts-ignore
-                transformQuestion(variation)
-            ),
-        };
-    }
-
-    if ("type" in question) {
-        switch (question.type) {
-            case CMSQuestionType.ListenAndChoose:
-            case CMSQuestionType.MultipleChoice:
-                return {
-                    id: question.id,
-                    type: question.type,
-                    question: question.question,
-                    answers: question.answers.map((answer) => ({
-                        id: answer.id,
-                        text: answer.text,
-                        correct: answer.correct,
-                    })),
-                };
-            case CMSQuestionType.Flashcard:
-                return {
-                    id: question.id,
-                    type: question.type,
-                    question: question.question,
-                    correctAnswer: question.correctAnswer,
-                };
-            case CMSQuestionType.ListenAndWrite:
-                return {
-                    id: question.id,
-                    type: question.type,
-                    question: question.question,
-                    audio: question.audio,
-                    correctAnswer: question.correctAnswer,
-                };
-            case CMSQuestionType.RecordVoice:
-                return {
-                    id: question.id,
-                    type: question.type,
-                    question: question.question,
-                };
-            case CMSQuestionType.Translate:
-                return {
-                    id: question.id,
-                    type: question.type,
-                    question: question.question,
-                    correctAnswer: question.correctAnswer,
-                };
+    try {
+        if ("isVariation" in question && question.isVariation) {
+            return {
+                id: question.id,
+                isVariation: question.isVariation,
+                variations: question.variations.map((variation) =>
+                    // @ts-ignore
+                    transformQuestion(variation)
+                ),
+            };
         }
+
+        if ("questionType" in question) {
+            switch (question.questionType) {
+                case CMSQuestionType.ListenAndChoose:
+                case CMSQuestionType.MultipleChoice:
+                    return {
+                        id: question.id,
+                        type: question.questionType,
+                        question: question.question,
+                        answers: question.answers.map((answer) => ({
+                            id: answer.id,
+                            answer: answer.answer,
+                            correct: answer.correct,
+                        })),
+                    };
+                case CMSQuestionType.Flashcard:
+                    return {
+                        id: question.id,
+                        type: question.questionType,
+                        question: question.question,
+                        correctAnswer: question.correctAnswer,
+                    };
+                case CMSQuestionType.ListenAndWrite:
+                    return {
+                        id: question.id,
+                        type: question.questionType,
+                        question: question.question,
+                        correctAnswer: question.correctAnswer,
+                    };
+                case CMSQuestionType.RecordVoice:
+                    return {
+                        id: question.id,
+                        type: question.questionType,
+                        question: question.question,
+                    };
+                case CMSQuestionType.Translate:
+                    return {
+                        id: question.id,
+                        type: question.questionType,
+                        question: question.question,
+                        correctAnswer: question.correctAnswer,
+                    };
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        console.log(question.id);
+
+        throw e;
     }
 }
 
@@ -191,7 +211,6 @@ export function transformUnit(unit: any) {
     if (unit.type === "story") {
         return {
             id: unit.id,
-            section: transformSection(unit.section),
             type: "story",
             title: unit.title,
             title_hr: unit.title_hr,
@@ -215,14 +234,14 @@ export function transformUnit(unit: any) {
 
     return {
         id: unit.id,
-        section: transformSection(unit.section),
         type: "questions",
         title: unit.title,
         title_hr: unit.title_hr,
         max_completion_xp: unit.max_completion_xp,
-        questions: unit.questions.map((question: CMSQuestion) =>
-            transformQuestion(question)
-        ),
+        questions: unit.questions.docs.map((question: CMSQuestion) => {
+            const t = transformQuestion(question);
+            return t;
+        }),
     };
 }
 

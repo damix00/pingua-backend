@@ -10,10 +10,13 @@
     },
     "dependencies": {
         "@prisma/client": "^6.1.0",
+        "@supabase/supabase-js": "^2.47.12",
+        "base64-arraybuffer": "^1.0.2",
         "cluster": "^0.7.7",
         "colors": "^1.4.0",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
+        "elevenlabs": "^1.50.2",
         "express": "^4.21.2",
         "express-fileupload": "^1.5.1",
         "firebase-admin": "^13.0.2",

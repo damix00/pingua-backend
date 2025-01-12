@@ -1,0 +1,15 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: server
+    expose:
+      - '9500'
+    ports:
+      - '9500:9500'
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules

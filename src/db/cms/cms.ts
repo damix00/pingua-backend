@@ -1,6 +1,11 @@
 import config from "../../utils/config";
-import { setSection } from "../redis/sections";
-import { CMSSection, CMSUnit, transformSection } from "./cms-types";
+import { getSectionByLevel, setSection } from "../redis/sections";
+import {
+    CMSSection,
+    CMSUnit,
+    transformSection,
+    transformUnits,
+} from "./cms-types";
 
 export async function fetchSections(): Promise<
     (CMSSection & {
@@ -60,4 +65,34 @@ export async function fetchSectionByLevel(level: number): Promise<
 
     await setSection(parsed);
     return parsed;
+}
+
+export async function fetchLevelWithUnits(level: number): Promise<
+    | (CMSSection & {
+          units: CMSUnit[];
+      })
+    | null
+> {
+    const data = await getSectionByLevel(level);
+
+    if (!data) {
+        return null;
+    }
+
+    const section = await fetch(
+        `${config.get("PAYLOAD_URL")}/api/units?section%5Bequals%5D=${
+            data.id
+        }&sort=createdAt&limit=0`
+    );
+
+    if (!section.ok) {
+        return null;
+    }
+
+    const json = await section.json();
+
+    return {
+        ...transformSection(data),
+        units: transformUnits(json.docs),
+    };
 }

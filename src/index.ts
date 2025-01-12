@@ -55,12 +55,15 @@ app.enable("trust proxy");
 for (const route of routes) {
     app.use(route.path, [
         (req: Request, res: Response, next: NextFunction) => {
-            if (route.method == "all") next();
-            else if (route.method == req.method.toLowerCase()) next();
-            else
+            if (route.method == "all") {
+                next();
+            } else if (route.method == req.method.toLowerCase()) {
+                next();
+            } else {
                 res.status(405).json({
                     message: "Method Not Allowed",
                 });
+            }
         },
         ...(Array.isArray(route.handler) ? route.handler : [route.handler]),
     ]);

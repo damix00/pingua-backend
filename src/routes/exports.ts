@@ -3,6 +3,7 @@ import verifyCode from "./v1/auth/email/verify";
 import me from "./v1/auth/me";
 import refreshToken from "./v1/auth/refresh-token";
 import register from "./v1/auth/register";
+import createLesson from "./v1/courses/[courseId]/lessons/_post";
 
 export type route = {
     path: string;
@@ -42,6 +43,11 @@ export const routes: route[] = [
     {
         path: "/v1/auth/refresh-token",
         handler: refreshToken,
+        method: "post",
+    },
+    {
+        path: "/v1/courses/:courseId/lessons",
+        handler: createLesson,
         method: "post",
     },
 ];

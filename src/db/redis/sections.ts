@@ -1,5 +1,5 @@
-import { redis } from "./redis";
-import { fetchSectionByLevel } from "../cms/cms";
+import { EXPIRY_TIME, redis } from "./redis";
+import { fetchLevelWithUnits, fetchSectionByLevel } from "../cms/cms";
 import { CMSSection, CMSUnit } from "../cms/cms-types";
 
 export async function getSectionByLevel(level: number): Promise<
@@ -21,9 +21,39 @@ export async function getSectionByLevel(level: number): Promise<
 
 export async function setSection(section: CMSSection & { unitCount: number }) {
     await redis.set(`section:${section.level}`, JSON.stringify(section), {
-        EX: 60 * 60 * 6, // 6H
+        EX: EXPIRY_TIME,
     });
     await redis.set(`section:${section.id}`, JSON.stringify(section), {
-        EX: 60 * 60 * 6, // 6H
+        EX: EXPIRY_TIME,
+    });
+}
+
+export async function getLevelWithUnits(level: number): Promise<
+    | (CMSSection & {
+          units: CMSUnit[];
+      })
+    | null
+> {
+    const data = await redis.get(`section:${level}:units`);
+
+    if (data) {
+        return JSON.parse(data);
+    }
+
+    const result = await fetchLevelWithUnits(level);
+
+    if (!result) {
+        return null;
+    }
+
+    return result;
+}
+
+export async function setLevelWithUnits(
+    level: number,
+    data: CMSSection & { units: CMSUnit[] }
+): Promise<void> {
+    await redis.set(`section:${level}:units`, JSON.stringify(data), {
+        EX: EXPIRY_TIME,
     });
 }

@@ -14,18 +14,6 @@ datasource db {
 }
 
 
-// Application characters
-enum AppCharacter {
-  PINGUA // Our mascot
-
-  // Human characters for the AI
-  ANNA
-  JOSEPH
-  MICHAEL
-  PETER
-  DAVID
-}
-
 enum Plan {
   FREE
   BASIC
@@ -112,31 +100,14 @@ model UnitQuestions {
   section Section @relation(fields: [sectionId], references: [id])
 }
 
-enum QuestionType {
-  Flashcard
-  MultipleChoice
-  ListenAndWrite
-  ListenAndChoose
-  RecordVoice
-  Translate
-}
-
-enum QuestionDifficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
 model Question {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   question String
   answer String
-  xp Int
-  level Int
   languageCode String
   appLanguageCode String
-  type QuestionType
-  difficulty QuestionDifficulty
+  type String
+  character String?
   image String?
   audio String?
   video String?
@@ -146,7 +117,7 @@ model Question {
 model AIConversation {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
-  character AppCharacter
+  character String
 
   // AI will extract key information from the conversation and store it here
   // This is because it's not possible to fit the entire conversation in the prompt
