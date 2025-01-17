@@ -43,7 +43,7 @@ export async function translate(
         messages: [
             {
                 role: "system",
-                content: `You are a translator bot. You will be given English text and you need to translate it to the following language code: "${language}" using the show_translation function.`,
+                content: `You will be given English text and you need to translate it to: "${language}".`,
             },
             {
                 role: "user",
@@ -62,7 +62,9 @@ export async function translate(
         throw new Error("Translation failed");
     }
 
-    // TODO: Implement this function
+    const args = message.tool_calls[0].function.arguments;
 
-    return "";
+    const parsed = JSON.parse(args);
+
+    return parsed.translation.trim();
 }

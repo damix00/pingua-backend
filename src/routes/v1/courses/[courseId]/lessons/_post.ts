@@ -6,7 +6,7 @@ import { authorize } from "../../../../../middleware/auth";
 import { ExtendedRequest } from "../../../../../types/request";
 import { fetchLevelWithUnits } from "../../../../../db/cms/cms";
 import { getTranslation, getTts } from "../../../../../db/redis/ai";
-import { CMSQuestion } from "../../../../../db/cms/cms-types";
+import { shuffleArray } from "../../../../../utils/util";
 
 export default [
     authorize,
@@ -74,6 +74,7 @@ export default [
                         // Initialize the translation and audio variables
 
                         let translation: string;
+                        let text_app_language: string | null = null;
                         let audio: string | null = null;
                         let answers: {
                             text: string;
@@ -86,6 +87,11 @@ export default [
                             translation = await getTranslation(
                                 line.text,
                                 courseLanguage
+                            );
+
+                            text_app_language = await getTranslation(
+                                line.text,
+                                appLanguage
                             );
 
                             // And generate TTS audio for it
@@ -104,17 +110,20 @@ export default [
                             for await (const answer of line.answers) {
                                 answers.push({
                                     text: await getTranslation(
-                                        answer.answer,
+                                        answer.text,
                                         appLanguage
                                     ),
                                     correct: answer.correct,
                                 });
                             }
+
+                            answers = shuffleArray(answers);
                         }
 
                         // Store the translated line in the translatedLines array
                         translatedLines[i] = {
                             text: translation,
+                            text_app_language,
                             character: line.character,
                             audio,
                             answers,
@@ -125,15 +134,23 @@ export default [
                 // Return the translated lines
                 return res.status(200).json({
                     type: currentUnit.type,
-                    data: translatedLines,
+                    data: {
+                        title: story.title,
+                        dialogue: translatedLines,
+                    },
                 });
             }
 
-            const questions: CMSQuestion[] = [];
+            const translatedQuestions: any[] = [];
+
+            const questions = currentUnit.questions;
+
+            // Concurrently translate each question, and store the result in the translatedQuestions array
+            await Promise.all(questions.map(async (question) => {}));
 
             res.status(200).json({
                 type: currentUnit.type,
-                data: questions,
+                data: translatedQuestions,
             });
         } catch (error) {
             console.error(error);

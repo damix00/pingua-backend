@@ -27,7 +27,7 @@ export type CMSUnitStory = {
         text: string;
         answers: {
             id: string;
-            answer: string;
+            text: string;
             correct: boolean;
         }[];
     }[];

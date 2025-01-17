@@ -6,7 +6,7 @@ const secret = config.get("JWT_SECRET");
 
 export async function sign(payload: any): Promise<string> {
     return jwt.sign(payload, secret, {
-        expiresIn: "7d",
+        expiresIn: "180d",
     });
 }
 
