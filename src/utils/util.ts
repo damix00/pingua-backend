@@ -1,3 +1,5 @@
+import { getRandomInt } from "./crypto";
+
 export function shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
 
@@ -7,4 +9,8 @@ export function shuffleArray<T>(array: T[]): T[] {
     }
 
     return shuffled;
+}
+
+export function randomItem<T>(array: T[]): T {
+    return array[getRandomInt(0, array.length)];
 }

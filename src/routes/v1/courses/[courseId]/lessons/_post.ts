@@ -5,8 +5,8 @@ import { Response } from "express";
 import { authorize } from "../../../../../middleware/auth";
 import { ExtendedRequest } from "../../../../../types/request";
 import { fetchLevelWithUnits } from "../../../../../db/cms/cms";
-import { getTranslation, getTts } from "../../../../../db/redis/ai";
-import { shuffleArray } from "../../../../../utils/util";
+import { translateDialogue } from "../../../../../db/cms/dialogue";
+import { translateQuestions } from "../../../../../db/cms/questions";
 
 export default [
     authorize,
@@ -61,74 +61,12 @@ export default [
 
             // If the unit is a story, translate the dialogue
             if (currentUnit.type == "story") {
-                // Generate an empty array of the same length as the dialogue, to store the translated lines
-                const translatedLines: any[] = Array.from({
-                    length: currentUnit.story.dialogue.length,
-                });
-
                 const story = currentUnit.story;
 
-                // Concurrently translate each line of dialogue, and store the result in the translatedLines array
-                await Promise.all(
-                    story.dialogue.map(async (line, i) => {
-                        // Initialize the translation and audio variables
-
-                        let translation: string;
-                        let text_app_language: string | null = null;
-                        let audio: string | null = null;
-                        let answers: {
-                            text: string;
-                            correct: boolean;
-                        }[] = [];
-
-                        // If the line is not a user line (said by a character, not interactive)
-                        if (line.character != "user") {
-                            // Translate it to the course language
-                            translation = await getTranslation(
-                                line.text,
-                                courseLanguage
-                            );
-
-                            text_app_language = await getTranslation(
-                                line.text,
-                                appLanguage
-                            );
-
-                            // And generate TTS audio for it
-                            audio = await getTts(translation, {
-                                character: line.character,
-                                language: courseLanguage,
-                            });
-                        } else {
-                            // If the line is a user line, translate it to the app language
-                            translation = await getTranslation(
-                                line.text,
-                                appLanguage
-                            );
-
-                            // And generate TTS audio for it
-                            for await (const answer of line.answers) {
-                                answers.push({
-                                    text: await getTranslation(
-                                        answer.text,
-                                        appLanguage
-                                    ),
-                                    correct: answer.correct,
-                                });
-                            }
-
-                            answers = shuffleArray(answers);
-                        }
-
-                        // Store the translated line in the translatedLines array
-                        translatedLines[i] = {
-                            text: translation,
-                            text_app_language,
-                            character: line.character,
-                            audio,
-                            answers,
-                        };
-                    })
+                // Generate an empty array of the same length as the dialogue, to store the translated lines
+                const translatedLines = await translateDialogue(
+                    currentUnit,
+                    course
                 );
 
                 // Return the translated lines
@@ -141,12 +79,10 @@ export default [
                 });
             }
 
-            const translatedQuestions: any[] = [];
-
-            const questions = currentUnit.questions;
-
-            // Concurrently translate each question, and store the result in the translatedQuestions array
-            await Promise.all(questions.map(async (question) => {}));
+            const translatedQuestions = await translateQuestions(
+                currentUnit,
+                course
+            );
 
             res.status(200).json({
                 type: currentUnit.type,
