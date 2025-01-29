@@ -3,6 +3,7 @@ import verifyCode from "./v1/auth/email/verify";
 import me from "./v1/auth/me";
 import refreshToken from "./v1/auth/refresh-token";
 import register from "./v1/auth/register";
+import getChats from "./v1/chats/_get";
 import createLesson from "./v1/courses/[courseId]/lessons/_post";
 
 export type route = {
@@ -49,5 +50,10 @@ export const routes: route[] = [
         path: "/v1/courses/:courseId/lessons",
         handler: createLesson,
         method: "post",
+    },
+    {
+        path: "/v1/chats",
+        handler: getChats,
+        method: "get",
     },
 ];

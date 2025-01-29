@@ -114,37 +114,58 @@ model Question {
   createdAt DateTime @default(now())
 }
 
+// AI will extract information from the conversation and store it here
+// This is because it's not possible to fit the entire conversation in the prompt
+// Plus, this will make it feel more like a real conversation
+model Memory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String @db.ObjectId
+  text String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id])
+}
+
 model AIConversation {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
   character String
-
-  // AI will extract key information from the conversation and store it here
-  // This is because it's not possible to fit the entire conversation in the prompt
-  // Plus, this will make it feel more like a real conversation
-  memories String[]
+  lastMessageTime DateTime
 
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
   messages AIConversationMessage[]
+  memories Memory[]
+
+  @@index([character])
 }
 
-enum MessageType {
-  TEXT
+enum AttachmentType {
   VOICE
-  IMAGE // The user can send an image and the AI can interpret it, using GPT-4
+  IMAGE
+}
+
+model Attachment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  messageId String @db.ObjectId
+  url String
+  type AttachmentType
+  createdAt DateTime @default(now())
+
+  message AIConversationMessage @relation(fields: [messageId], references: [id])
 }
 
 model AIConversationMessage {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   conversationId String @db.ObjectId
   userMessage Boolean // If the user sent the message, or the AI
-  messageContent String
-  messageType MessageType
-  contentUrl String[] // If the message is an image or voice, the URL(s) will be stored here
+  content String
+  read Boolean @default(false)
 
   createdAt DateTime @default(now())
 
   conversation AIConversation @relation(fields: [conversationId], references: [id])
+  attachments Attachment[]
 }

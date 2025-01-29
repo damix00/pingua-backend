@@ -51,9 +51,6 @@ export default [
                 });
             }
 
-            const appLanguage = course.appLanguageCode;
-            const courseLanguage = course.languageCode;
-
             // Translate the unit data
             // The unit data is given in english, so we need to translate it to the course language
             // The translations are cached in Redis, so we don't need to translate them again if they have been translated before
@@ -94,3 +91,4 @@ export default [
         }
     },
 ];
+``;
