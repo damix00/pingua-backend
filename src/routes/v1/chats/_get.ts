@@ -37,7 +37,7 @@ export default [
             });
 
             res.status(200).json({
-                messages: data.map((d) => ({
+                chats: data.map((d) => ({
                     id: d.id,
                     character: d.character,
                     messages: d.messages,
