@@ -7,8 +7,10 @@ import { ExtendedRequest } from "../../../../../types/request";
 import { fetchLevelWithUnits } from "../../../../../db/cms/cms";
 import { translateDialogue } from "../../../../../db/cms/dialogue";
 import { translateQuestions } from "../../../../../db/cms/questions";
+import requireMethod from "../../../../../middleware/require-method";
 
 export default [
+    requireMethod("POST"),
     authorize,
     async (req: ExtendedRequest, res: Response) => {
         try {

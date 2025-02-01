@@ -131,7 +131,7 @@ model AIConversation {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
   character String
-  lastMessageTime DateTime
+  lastMessageTime DateTime?
 
   createdAt DateTime @default(now())
 

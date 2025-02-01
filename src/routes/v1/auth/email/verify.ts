@@ -1,3 +1,6 @@
+// POST /v1/auth/email/verify
+// Verifies the user's email with the provided code
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../../types/request";
 import { Course, Section, User, VerificationStatus } from "@prisma/client";
@@ -5,6 +8,7 @@ import { prisma } from "../../../../db/prisma";
 import { signUser } from "../../../../utils/jwt";
 import { toAuthCourse, toAuthUser } from "../../../../db/transformators/user";
 import { getSectionByLevel } from "../../../../db/redis/sections";
+import requireMethod from "../../../../middleware/require-method";
 
 async function verify(
     email: string,
@@ -71,71 +75,74 @@ async function verify(
     };
 }
 
-export default async function verifyCode(req: ExtendedRequest, res: Response) {
-    try {
-        const { email, code } = req.body;
+export default [
+    requireMethod("POST"),
+    async (req: ExtendedRequest, res: Response) => {
+        try {
+            const { email, code } = req.body;
 
-        if (!email || !code) {
-            return res.status(400).json({
-                error: "Missing required fields",
-            });
-        }
+            if (!email || !code) {
+                return res.status(400).json({
+                    error: "Missing required fields",
+                });
+            }
 
-        const result = await verify(email, code);
+            const result = await verify(email, code);
 
-        if (!result.success) {
-            return res.status(400).json({
-                error: "Invalid code",
-            });
-        }
+            if (!result.success) {
+                return res.status(400).json({
+                    error: "Invalid code",
+                });
+            }
 
-        let courses: (Course & {
-            sections: Section[];
-        })[] = [];
+            let courses: (Course & {
+                sections: Section[];
+            })[] = [];
 
-        if (result.user) {
-            courses = await prisma.course.findMany({
-                where: {
-                    userId: result.user.id,
-                },
-                include: {
-                    sections: {
-                        where: {
-                            finished: false,
+            if (result.user) {
+                courses = await prisma.course.findMany({
+                    where: {
+                        userId: result.user.id,
+                    },
+                    include: {
+                        sections: {
+                            where: {
+                                finished: false,
+                            },
                         },
                     },
-                },
+                });
+            }
+
+            const sections = [];
+
+            for (const course of courses) {
+                const section = await getSectionByLevel(course.level);
+
+                sections.push({
+                    course_id: course.id,
+                    ...section,
+                });
+            }
+
+            return res.status(200).json({
+                user: result.user && toAuthUser(result.user),
+                courses: courses.map((course) =>
+                    toAuthCourse({
+                        ...course,
+                        section: course.sections[0],
+                    })
+                ),
+                jwt: result.jwt,
+                id: result.id,
+                section_data: sections,
+            });
+        } catch (error) {
+            console.error(error);
+
+            return res.status(500).json({
+                error: "Internal server error",
             });
         }
-
-        const sections = [];
-
-        for (const course of courses) {
-            const section = await getSectionByLevel(course.level);
-
-            sections.push({
-                course_id: course.id,
-                ...section,
-            });
-        }
-
-        return res.status(200).json({
-            user: result.user && toAuthUser(result.user),
-            courses: courses.map((course) =>
-                toAuthCourse({
-                    ...course,
-                    section: course.sections[0],
-                })
-            ),
-            jwt: result.jwt,
-            id: result.id,
-            section_data: sections,
-        });
-    } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            error: "Internal server error",
-        });
-    }
-}
+    },
+];
