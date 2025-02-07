@@ -1,43 +1,40 @@
+import { Router } from "express";
 import sendCode from "./v1/auth/email/send-code";
 import verifyCode from "./v1/auth/email/verify";
 import me from "./v1/auth/me";
 import refreshToken from "./v1/auth/refresh-token";
 import register from "./v1/auth/register";
+import sendMessage from "./v1/chats/[id]/messages/_post";
 import handleChats from "./v1/chats/handler";
 import createLesson from "./v1/courses/[courseId]/lessons/_post";
 
 export type route = {
-    path: string;
-    handler: any;
+    router: Router;
 };
 
 export const routes: route[] = [
     {
-        path: "/v1/auth/email/send-code",
-        handler: sendCode,
+        router: sendCode,
     },
     {
-        path: "/v1/auth/email/verify",
-        handler: verifyCode,
+        router: verifyCode,
     },
     {
-        path: "/v1/auth/register",
-        handler: register,
+        router: register,
     },
     {
-        path: "/v1/auth/me",
-        handler: me,
+        router: me,
     },
     {
-        path: "/v1/auth/refresh-token",
-        handler: refreshToken,
+        router: refreshToken,
     },
     {
-        path: "/v1/courses/:courseId/lessons",
-        handler: createLesson,
+        router: createLesson,
     },
     {
-        path: "/v1/chats",
-        handler: handleChats,
+        router: sendMessage,
+    },
+    {
+        router: handleChats,
     },
 ];

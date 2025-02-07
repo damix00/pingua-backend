@@ -1,20 +1,14 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Response, Router } from "express";
 import { authorize } from "../../../middleware/auth";
 import { ExtendedRequest } from "../../../types/request";
 import _get from "./_get";
 import _post from "./_post";
 
-export default [
-    authorize,
-    (req: ExtendedRequest, res: Response, next: NextFunction) => {
-        if (req.method === "GET") {
-            return _get(req, res);
-        }
+const router = Router();
 
-        if (req.method === "POST") {
-            return _post(req, res);
-        }
+router.use(authorize as any);
 
-        res.status(405).json({ error: "Method not allowed" });
-    },
-];
+router.get("/v1/chats", _get as any);
+router.post("/v1/chats", _post as any);
+
+export default router;

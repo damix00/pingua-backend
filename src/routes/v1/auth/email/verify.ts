@@ -1,14 +1,13 @@
 // POST /v1/auth/email/verify
 // Verifies the user's email with the provided code
 
-import { Response } from "express";
+import { Response, Router } from "express";
 import { ExtendedRequest } from "../../../../types/request";
 import { Course, Section, User, VerificationStatus } from "@prisma/client";
 import { prisma } from "../../../../db/prisma";
 import { signUser } from "../../../../utils/jwt";
 import { toAuthCourse, toAuthUser } from "../../../../db/transformators/user";
 import { getSectionByLevel } from "../../../../db/redis/sections";
-import requireMethod from "../../../../middleware/require-method";
 
 async function verify(
     email: string,
@@ -75,8 +74,11 @@ async function verify(
     };
 }
 
-export default [
-    requireMethod("POST"),
+const router = Router();
+
+router.post(
+    "/v1/auth/email/verify",
+    // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {
             const { email, code } = req.body;
@@ -144,5 +146,7 @@ export default [
                 error: "Internal server error",
             });
         }
-    },
-];
+    }
+);
+
+export default router;

@@ -1,12 +1,11 @@
 // POST /v1/auth/email/send-code
 // Sends a verification code to the user's email
 
-import { Response } from "express";
+import { Response, Router } from "express";
 import { ExtendedRequest } from "../../../../types/request";
 import { getRandomInt } from "../../../../utils/crypto";
 import { prisma } from "../../../../db/prisma";
 import { VerificationStatus } from "@prisma/client";
-import requireMethod from "../../../../middleware/require-method";
 
 async function generateCode(
     email: string,
@@ -47,28 +46,34 @@ async function generateCode(
     return "";
 }
 
-export default [
-    requireMethod("POST"),
+const router = Router();
+
+router.post(
+    "/v1/auth/email/send-code",
+    // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {
             const email = req.body.email;
 
             if (!email) {
-                return res.status(400).json({
+                res.status(400).json({
                     error: "Email is required",
                 });
+                return;
             }
 
             if (email.length > 255) {
-                return res.status(400).json({
+                res.status(400).json({
                     error: "Email is too long",
                 });
+                return;
             }
 
             if (!email.includes("@")) {
-                return res.status(400).json({
+                res.status(400).json({
                     error: "Invalid email",
                 });
+                return;
             }
 
             const code = await generateCode(email, req.ip);
@@ -89,12 +94,13 @@ export default [
             };
 
             if (response?.error) {
-                return res.status(500).json({
+                res.status(500).json({
                     message: "Failed to send email",
                 });
+                return;
             }
 
-            return res.status(200).json({
+            res.status(200).json({
                 message: "Code sent",
             });
         } catch (error) {
@@ -104,5 +110,7 @@ export default [
                 message: "Internal server error",
             });
         }
-    },
-];
+    }
+);
+
+export default router;

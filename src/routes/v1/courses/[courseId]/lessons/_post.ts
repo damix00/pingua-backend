@@ -1,17 +1,19 @@
 // POST /v1/courses/:courseId/lessons
 // Generate a new lesson for the user, based on the current state (section, unit etc.)
 
-import { Response } from "express";
+import { Response, Router } from "express";
 import { authorize } from "../../../../../middleware/auth";
 import { ExtendedRequest } from "../../../../../types/request";
 import { fetchLevelWithUnits } from "../../../../../db/cms/cms";
 import { translateDialogue } from "../../../../../db/cms/dialogue";
 import { translateQuestions } from "../../../../../db/cms/questions";
-import requireMethod from "../../../../../middleware/require-method";
 
-export default [
-    requireMethod("POST"),
-    authorize,
+const router = Router();
+router.use(authorize as any);
+
+router.post(
+    "/v1/courses/:courseId/lessons",
+    // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {
             const courseId = req.params.courseId;
@@ -91,6 +93,7 @@ export default [
             console.error(error);
             return res.status(500).json({ message: "Internal server error" });
         }
-    },
-];
-``;
+    }
+);
+
+export default router;

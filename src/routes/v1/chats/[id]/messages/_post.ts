@@ -1,0 +1,143 @@
+// POST /v1/chats/[id]/messages
+// Send a message to the chat with the given ID
+
+import { Response, Router } from "express";
+import { ExtendedRequest } from "../../../../../types/request";
+import { prisma } from "../../../../../db/prisma";
+import {
+    getCharacterSystemMessage,
+    sendMessage,
+} from "../../../../../apis/ai/openai";
+
+const router = Router();
+
+router.post(
+    "/v1/chats/:id/messages",
+    // @ts-ignore
+    async (req: ExtendedRequest, res: Response) => {
+        try {
+            const { id } = req.params;
+            const { content, language } = req.body;
+
+            if (!content) {
+                return res.status(400).json({ error: "Content is required" });
+            }
+
+            const chat = await prisma.aIConversation.findUnique({
+                where: {
+                    id,
+                },
+            });
+
+            if (!chat) {
+                return res.status(404).json({ message: "Chat not found" });
+            }
+
+            const lastMessages = await prisma.aIConversationMessage.findMany({
+                where: {
+                    conversationId: id,
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+                take: 10,
+            });
+
+            // Limit should be 25000 characters
+            const maxCharacterLimit = 25000;
+            let characterCnt = 0;
+            for (const msg of lastMessages) {
+                characterCnt += msg.content.length;
+            }
+
+            while (characterCnt > maxCharacterLimit) {
+                const lastMsg = lastMessages.pop();
+                characterCnt -= lastMsg?.content.length ?? 0;
+            }
+
+            const sent = await prisma.aIConversationMessage.create({
+                data: {
+                    content,
+                    conversationId: id,
+                    userMessage: true,
+                },
+            });
+
+            if (!sent) {
+                return res
+                    .status(500)
+                    .json({ message: "Failed to send message" });
+            }
+
+            res.setHeader("Content-Type", "text/event-stream");
+            res.setHeader("Transfer-Encoding", "chunked");
+            res.setHeader("Connection", "keep-alive");
+
+            res.write(JSON.stringify({ sent: true, id: sent.id }));
+
+            // Stream AI response
+            const response = await sendMessage(
+                [
+                    ...lastMessages.map((msg) => ({
+                        role: (msg.userMessage ? "user" : "assistant") as any,
+                        content: msg.content,
+                    })),
+                    {
+                        role: "user",
+                        content,
+                    },
+                ],
+                getCharacterSystemMessage(chat.character as any, language)
+            );
+
+            let responseContent = "";
+            let messages = [];
+
+            // The model will output <new-message /> to indicate a new message
+
+            for await (const chunk of response) {
+                const chunkData = chunk.choices[0]?.delta?.content;
+
+                if (!chunkData) {
+                    continue;
+                }
+
+                if (chunk.choices[0].finish_reason) {
+                    break;
+                }
+
+                responseContent += chunkData;
+
+                if (responseContent.includes("<new-message />")) {
+                    const content = responseContent
+                        .replace("<new-message />", "")
+                        .trim();
+                    messages.push(content);
+                    responseContent = "";
+                    res.write(JSON.stringify({ content }));
+                }
+            }
+
+            if (responseContent) {
+                messages.push(responseContent);
+                res.write(JSON.stringify({ content: responseContent }));
+            }
+
+            // Save AI response
+            const msg = await prisma.aIConversationMessage.createMany({
+                data: messages.map((content) => ({
+                    content,
+                    conversationId: id,
+                    userMessage: false,
+                })),
+            });
+
+            res.end();
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+);
+
+export default router;

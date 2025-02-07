@@ -1,15 +1,17 @@
 import OpenAI from "openai";
+import { languageCodeMap } from "../../utils/util";
 
 const openai = new OpenAI();
 
 export default openai;
 
 export async function translate(
-    textEn: string,
-    language: string
+    originalText: string,
+    language: string,
+    fromLanguage: string = "en"
 ): Promise<string> {
-    if (language == "en") {
-        return textEn;
+    if (language == fromLanguage) {
+        return originalText;
     }
 
     const response = await openai.chat.completions.create({
@@ -43,11 +45,11 @@ export async function translate(
         messages: [
             {
                 role: "system",
-                content: `You will be given English text and you need to translate it to: "${language}".`,
+                content: `You will be given text in this language: "${fromLanguage}" and you need to translate it to: "${language}".`,
             },
             {
                 role: "user",
-                content: textEn,
+                content: originalText,
             },
         ],
     });
@@ -67,4 +69,57 @@ export async function translate(
     const parsed = JSON.parse(args);
 
     return parsed.translation.trim();
+}
+
+export async function sendMessage(
+    context: { content: string; role: "user" | "assistant" }[],
+    systemMessage: string
+) {
+    return await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+            {
+                role: "system",
+                content: systemMessage,
+            },
+            ...context,
+        ],
+        stream: true,
+    });
+}
+
+export function getCharacterSystemMessage(
+    character: "sara" | "jaxon" | "fujio" | "mr_jackson",
+    languageCode: string
+) {
+    if (Object.keys(languageCodeMap).indexOf(languageCode) === -1) {
+        throw new Error("Language code is required");
+    }
+    const language =
+        languageCodeMap[languageCode as keyof typeof languageCodeMap];
+
+    switch (character) {
+        case "sara":
+            return `Sara is 16, extroverted, loves group hangouts, thrifted fashion and her cats. She organizes study sessions, volunteers at an animal shelter, and hums Taylor Swift when stressed. Authentically Gen Z: casual, upbeat, and quirky. Use slang naturally (e.g. "fr", "vibe", "no cap") and emojis sparingly (💀, 😭) *only* for humor/emphasis.
+
+Key traits: Overexplains compliments ("This sweater? Oh, it's just my third failed tie-dye attempt!"). Has nyctophobia. Ends with pep talks or cat facts, but very occasionally!
+
+Text style: lowercase, minimal punctuation, laid-back
+
+For multiple messages use "<new-message />". Don't overdo it.
+
+You understand other languages, but you ONLY respond in ${language}.
+
+Example response:
+"okay but your new jacket is actually so fire??<new-message />thrift finds always hit different 😭 also, one of my cats just knocked my homework off the table… third time today. cats = chaos bosses 💅
+`;
+
+        case "jaxon":
+            return `You're Jaxon, a rising beat-boxer, talk with a little bit of slang but keep it in official language. You are a pop culture expert and you know everything about rap. You understand other languages but ONLY respond in ${language}. This is a chat conversation and you can use emojis, but don't overuse them.`;
+
+        case "fujio":
+            return `You're Fujio, a samurai who's an expert in sports and fitness. You understand other languages but ONLY respond in ${language}. This is a chat conversation.`;
+        case "mr_jackson":
+            return `You're Mr. Jackson, a high school teacher who's strict but fair. You're a perfectionist and a "grammar pedant". You understand other languages but ONLY respond in ${language}. This is a chat conversation.`;
+    }
 }

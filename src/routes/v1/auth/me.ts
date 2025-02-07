@@ -1,16 +1,19 @@
 // GET /v1/auth/me
 // Returns the user's data, courses, and section data
 
-import { Response } from "express";
+import { Response, Router } from "express";
 import { ExtendedRequest } from "../../../types/request";
 import { authorize } from "../../../middleware/auth";
 import { toAuthCourse, toAuthUser } from "../../../db/transformators/user";
 import { getSectionByLevel } from "../../../db/redis/sections";
-import requireMethod from "../../../middleware/require-method";
 
-export default [
-    requireMethod("GET"),
-    authorize,
+const router = Router();
+
+router.use(authorize as any);
+
+router.get(
+    "/v1/auth/me",
+    // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         const sections = [];
 
@@ -28,5 +31,6 @@ export default [
             courses: req.courses.map(toAuthCourse),
             section_data: sections,
         });
-    },
-];
+    }
+);
+export default router;

@@ -1,7 +1,7 @@
 // POST /v1/auth/register
 // Registers a new user with the provided email, username, name, language, fluency level, and verification code
 
-import { Response } from "express";
+import { Response, Router } from "express";
 import { ExtendedRequest } from "../../../types/request";
 import { prisma } from "../../../db/prisma";
 import { VerificationStatus } from "@prisma/client";
@@ -9,7 +9,6 @@ import { signUser } from "../../../utils/jwt";
 import { toAuthCourse, toAuthUser } from "../../../db/transformators/user";
 import { isSupportedLanguage } from "../../../db/languages";
 import { getSectionByLevel } from "../../../db/redis/sections";
-import requireMethod from "../../../middleware/require-method";
 
 async function checkCode(id: string, email: string): Promise<boolean> {
     try {
@@ -39,8 +38,11 @@ async function checkCode(id: string, email: string): Promise<boolean> {
     }
 }
 
-export default [
-    requireMethod("POST"),
+const router = Router();
+
+router.post(
+    "/v1/auth/register",
+    // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         const {
             email,
@@ -162,5 +164,7 @@ export default [
                 message: "Internal server error",
             });
         }
-    },
-];
+    }
+);
+
+export default router;

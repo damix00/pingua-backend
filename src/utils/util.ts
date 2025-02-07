@@ -14,3 +14,15 @@ export function shuffleArray<T>(array: T[]): T[] {
 export function randomItem<T>(array: T[]): T {
     return array[getRandomInt(0, array.length)];
 }
+
+export const languageCodeMap = {
+    en: "English",
+    es: "Spanish",
+    fr: "French",
+    de: "German",
+    it: "Italian",
+    hr: "Croatian",
+    nl: "Dutch",
+    pl: "Polish",
+    pt: "Portuguese",
+};
