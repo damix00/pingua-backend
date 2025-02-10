@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authorize } from "../../../middleware/auth";
-import { translate } from "../../../apis/ai/openai";
+import { getTranslation } from "../../../db/redis/ai";
 
 const router = Router();
 
@@ -17,7 +17,12 @@ router.post(
                 return res.status(400).json({ error: "Bad Request" });
             }
 
-            const translation = await translate(text, toLanguage, fromLanguage);
+            const translation = await getTranslation(
+                text,
+                toLanguage,
+                "gpt-4o-mini",
+                fromLanguage
+            );
 
             return res.json({ translation });
         } catch (error) {

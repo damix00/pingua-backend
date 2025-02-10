@@ -31,33 +31,35 @@ export async function getTts(
 }
 
 export async function setTranslation(
-    textEn: string,
+    text: string,
     translation: string,
     toLanguage: string,
-    model: string
+    model: string,
+    fromLanguage: string = "en"
 ) {
     return await redis.set(
-        `translation:${toLanguage}:${model}:${textEn}`,
+        `translation:to-${toLanguage}:${model}:text-${text}:from-${fromLanguage}`,
         translation
     );
 }
 
 export async function getTranslation(
-    textEn: string,
+    text: string,
     toLanguage: string,
-    model: string = "gpt-4o-mini"
+    model: string = "gpt-4o-mini",
+    fromLanguage: string = "en"
 ) {
     const cached = await redis.get(
-        `translation:${toLanguage}:${model}:${textEn}`
+        `translation:to-${toLanguage}:${model}:text-${text}:from-${fromLanguage}`
     );
 
     if (cached) {
         return cached;
     }
 
-    const response = await translate(textEn, toLanguage);
+    const response = await translate(text, toLanguage, fromLanguage);
 
-    await setTranslation(textEn, response, toLanguage, model);
+    await setTranslation(text, response, toLanguage, model, fromLanguage);
 
     return response;
 }

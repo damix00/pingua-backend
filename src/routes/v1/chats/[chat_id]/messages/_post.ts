@@ -123,18 +123,24 @@ router.post(
                 res.write(JSON.stringify({ content: responseContent }));
             }
 
+            const msgs = [];
+
             // Save AI response
             for await (const message of messages) {
                 // We don't use saveMany because we want to save the messages in order
                 // with saveMany all messages are saved at the same time and the order is not guaranteed
-                await prisma.aIConversationMessage.create({
-                    data: {
-                        content: message,
-                        conversationId: id,
-                        userMessage: false,
-                    },
-                });
+                msgs.push(
+                    await prisma.aIConversationMessage.create({
+                        data: {
+                            content: message,
+                            conversationId: id,
+                            userMessage: false,
+                        },
+                    })
+                );
             }
+
+            res.write(JSON.stringify({ finished: true, messages: msgs }));
 
             res.end();
         } catch (error) {
