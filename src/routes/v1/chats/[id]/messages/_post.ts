@@ -124,13 +124,17 @@ router.post(
             }
 
             // Save AI response
-            const msg = await prisma.aIConversationMessage.createMany({
-                data: messages.map((content) => ({
-                    content,
-                    conversationId: id,
-                    userMessage: false,
-                })),
-            });
+            for await (const message of messages) {
+                // We don't use saveMany because we want to save the messages in order
+                // with saveMany all messages are saved at the same time and the order is not guaranteed
+                await prisma.aIConversationMessage.create({
+                    data: {
+                        content: message,
+                        conversationId: id,
+                        userMessage: false,
+                    },
+                });
+            }
 
             res.end();
         } catch (error) {
