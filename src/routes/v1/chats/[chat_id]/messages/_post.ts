@@ -140,7 +140,9 @@ router.post(
                 );
             }
 
-            res.write(JSON.stringify({ finished: true, messages: msgs }));
+            res.write(
+                JSON.stringify({ finished: true, messages: msgs.reverse() })
+            );
 
             res.end();
         } catch (error) {
