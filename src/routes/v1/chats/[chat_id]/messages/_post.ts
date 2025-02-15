@@ -122,11 +122,7 @@ router.post(
                         .trim();
                     messages.push(content);
                     responseContent = "";
-                    // Delay the response to simulate typing
-                    setTimeout(() => {
-                        res.write(JSON.stringify({ content }));
-                        prevDelay += content.length; // prevent race conditions
-                    }, 1000 + content.length + prevDelay);
+                    res.write(JSON.stringify({ content }));
                 }
             }
 
