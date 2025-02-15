@@ -1,7 +1,10 @@
 import OpenAI from "openai";
 import { languageCodeMap } from "../../utils/util";
+import config from "../../utils/config";
 
-const openai = new OpenAI();
+const openai = new OpenAI({
+    apiKey: config.get("OPENAI_API_KEY"),
+});
 
 export default openai;
 
