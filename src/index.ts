@@ -53,7 +53,7 @@ app.use(userAgent); // add user agent to request
 app.enable("trust proxy");
 
 for (const route of routes) {
-    app.use(route.router);
+    app.use(route.basePath, route.router);
 }
 
 app.all("*", (req, res) => {

@@ -12,7 +12,7 @@ import {
 const router = Router();
 
 router.post(
-    "/v1/chats/:id/messages",
+    "/:id/messages",
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {

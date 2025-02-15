@@ -48,12 +48,12 @@ const checkParam = async (
 };
 
 router.post(
-    "/v1/chats/:chat_id/messages/:message_id/tts",
+    "/:chat_id/messages/:message_id/tts",
     checkParam as any,
     tts as any
 );
 router.delete(
-    "/v1/chats/:chat_id/messages/:message_id",
+    "/:chat_id/messages/:message_id",
     checkParam as any,
     _delete as any
 );

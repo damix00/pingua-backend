@@ -7,7 +7,7 @@ const router = Router();
 router.use(authorize as any);
 
 router.post(
-    "/v1/translations",
+    "/",
     // @ts-ignore
     async (req, res) => {
         try {

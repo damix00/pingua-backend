@@ -8,7 +8,7 @@ const router = Router();
 
 router.use(authorize as any);
 
-router.get("/v1/chats", _get as any);
-router.post("/v1/chats", _post as any);
+router.get("/", _get as any);
+router.post("/", _post as any);
 
 export default router;

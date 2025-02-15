@@ -41,7 +41,7 @@ async function checkCode(id: string, email: string): Promise<boolean> {
 const router = Router();
 
 router.post(
-    "/v1/auth/register",
+    "/register",
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         const {

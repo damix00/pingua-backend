@@ -12,37 +12,48 @@ import handleMessages from "./v1/chats/[chat_id]/messages/[message_id]/handler";
 
 export type route = {
     router: Router;
+    basePath: string;
 };
 
 export const routes: route[] = [
     {
         router: sendCode,
+        basePath: "/v1/auth/email",
     },
     {
         router: verifyCode,
+        basePath: "/v1/auth/email",
     },
     {
         router: register,
+        basePath: "/v1/auth",
     },
     {
         router: me,
+        basePath: "/v1/auth",
     },
     {
         router: refreshToken,
+        basePath: "/v1/auth",
     },
     {
         router: createLesson,
+        basePath: "/v1/courses",
     },
     {
         router: sendMessage,
+        basePath: "/v1/chats",
     },
     {
         router: handleChats,
+        basePath: "/v1/chats",
     },
     {
         router: translate,
+        basePath: "/v1/translations",
     },
     {
         router: handleMessages,
+        basePath: "/v1/chats/",
     },
 ];

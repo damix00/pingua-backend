@@ -12,7 +12,7 @@ const router = Router();
 router.use(authorize as any);
 
 router.post(
-    "/v1/courses/:courseId/lessons",
+    "/:courseId/lessons",
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {

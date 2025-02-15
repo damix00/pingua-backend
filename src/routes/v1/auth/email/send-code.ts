@@ -49,7 +49,7 @@ async function generateCode(
 const router = Router();
 
 router.post(
-    "/v1/auth/email/send-code",
+    "/send-code",
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {

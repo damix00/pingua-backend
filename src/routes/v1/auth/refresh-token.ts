@@ -11,7 +11,7 @@ const router = Router();
 router.use(authorize as any);
 
 router.post(
-    "/v1/auth/refresh-token",
+    "/refresh-token",
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {

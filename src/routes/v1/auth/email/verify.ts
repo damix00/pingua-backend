@@ -77,7 +77,7 @@ async function verify(
 const router = Router();
 
 router.post(
-    "/v1/auth/email/verify",
+    "/verify",
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {

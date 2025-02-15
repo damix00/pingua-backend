@@ -12,7 +12,7 @@ const router = Router();
 router.use(authorize as any);
 
 router.get(
-    "/v1/auth/me",
+    "/me",
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         const sections = [];
