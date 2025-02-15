@@ -8,6 +8,7 @@ import {
     getCharacterSystemMessage,
     sendMessage,
 } from "../../../../../apis/ai/openai";
+import { sleep } from "../../../../../utils/util";
 
 const router = Router();
 
@@ -69,9 +70,14 @@ router.post(
                     .json({ message: "Failed to send message" });
             }
 
-            res.setHeader("Content-Type", "text/event-stream");
-            res.setHeader("Transfer-Encoding", "chunked");
-            res.setHeader("Connection", "keep-alive");
+            res.writeHead(200, {
+                "Content-Type": "text/event-stream",
+                "X-Accel-Buffering": "no",
+                "Transfer-Encoding": "chunked",
+                Connection: "keep-alive",
+                "Cache-Control": "no-cache",
+            });
+            res.flushHeaders();
 
             res.write(JSON.stringify({ sent: true, id: sent.id }));
 
@@ -92,6 +98,8 @@ router.post(
 
             let responseContent = "";
             let messages = [];
+
+            let prevDelay = 0;
 
             // The model will output <new-message /> to indicate a new message
 
@@ -114,7 +122,11 @@ router.post(
                         .trim();
                     messages.push(content);
                     responseContent = "";
-                    res.write(JSON.stringify({ content }));
+                    // Delay the response to simulate typing
+                    setTimeout(() => {
+                        res.write(JSON.stringify({ content }));
+                        prevDelay += content.length; // prevent race conditions
+                    }, 1000 + content.length + prevDelay);
                 }
             }
 

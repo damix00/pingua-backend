@@ -15,6 +15,10 @@ export function randomItem<T>(array: T[]): T {
     return array[getRandomInt(0, array.length)];
 }
 
+export function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export const languageCodeMap = {
     en: "English",
     es: "Spanish",
