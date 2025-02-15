@@ -154,7 +154,12 @@ router.post(
                         section: sections,
                     }),
                 ],
-                section_data: await getSectionByLevel(1),
+                section_data: [
+                    {
+                        course_id: course.id,
+                        ...(await getSectionByLevel(1)),
+                    },
+                ],
             });
         } catch (error) {
             console.error(error);
