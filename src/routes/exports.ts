@@ -9,6 +9,7 @@ import handleChats from "./v1/chats/handler";
 import createLesson from "./v1/courses/[courseId]/lessons/_post";
 import translate from "./v1/translations/_post";
 import handleMessages from "./v1/chats/[chat_id]/messages/[message_id]/handler";
+import updateLesson from "./v1/courses/[courseId]/lessons/[lessonId]/_patch";
 
 export type route = {
     router: Router;
@@ -55,5 +56,9 @@ export const routes: route[] = [
     {
         router: handleMessages,
         basePath: "/v1/chats/",
+    },
+    {
+        router: updateLesson,
+        basePath: "/v1/courses/",
     },
 ];

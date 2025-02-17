@@ -74,7 +74,6 @@ model Course {
   
   user User @relation(fields: [userId], references: [id])
   sections Section[]
-  questions UnitQuestions[]
 }
 
 model Section {
@@ -86,32 +85,36 @@ model Section {
 
   course Course @relation(fields: [courseId], references: [id])
   questions UnitQuestions[]
+  stories UnitStory[]
   
   @@index([finished])
 }
 
 model UnitQuestions {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  courseId String @db.ObjectId
   sectionId String @db.ObjectId
   xp Int
+  completed Boolean
+  level Int
+  fluencyLevel Int
+  data Json
+  createdAt DateTime @default(now())
 
-  course Course @relation(fields: [courseId], references: [id])
   section Section @relation(fields: [sectionId], references: [id])
 }
 
-model Question {
+// When a user completes a story, we will store it here
+model UnitStory {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  question String
-  answer String
-  languageCode String
-  appLanguageCode String
-  type String
-  character String?
-  image String?
-  audio String?
-  video String?
+  sectionId String @db.ObjectId
+  xp Int
+  completed Boolean
+  level Int
+  fluencyLevel Int
+  data Json
   createdAt DateTime @default(now())
+
+  section Section @relation(fields: [sectionId], references: [id])
 }
 
 // AI will extract information from the conversation and store it here

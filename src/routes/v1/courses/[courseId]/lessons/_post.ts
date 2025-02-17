@@ -7,6 +7,8 @@ import { ExtendedRequest } from "../../../../../types/request";
 import { fetchLevelWithUnits } from "../../../../../db/cms/cms";
 import { translateDialogue } from "../../../../../db/cms/dialogue";
 import { translateQuestions } from "../../../../../db/cms/questions";
+import { prisma } from "../../../../../db/prisma";
+import { getTranslation } from "../../../../../db/redis/ai";
 
 const router = Router();
 router.use(authorize as any);
@@ -70,24 +72,61 @@ router.post(
                     course
                 );
 
+                const data = await prisma.unitStory.create({
+                    data: {
+                        sectionId: section.id,
+                        xp: 0,
+                        fluencyLevel: course.fluencyLevel,
+                        completed: false,
+                        level: section.level,
+                        data: JSON.stringify(translatedLines),
+                    },
+                });
+
+                if (!data) {
+                    return res.status(500).json({
+                        message: "Failed to create unit story",
+                    });
+                }
+
                 // Return the translated lines
                 return res.status(200).json({
                     type: currentUnit.type,
                     data: {
-                        title: story.title,
+                        id: data.id,
+                        title: await getTranslation(
+                            story.title,
+                            course.appLanguageCode
+                        ),
                         dialogue: translatedLines,
                     },
                 });
             }
 
-            const translatedQuestions = await translateQuestions(
+            let translatedQuestions = await translateQuestions(
                 currentUnit,
                 course
             );
 
+            translatedQuestions = translatedQuestions.reverse();
+
+            const data = await prisma.unitQuestions.create({
+                data: {
+                    sectionId: section.id,
+                    xp: 0,
+                    fluencyLevel: course.fluencyLevel,
+                    completed: false,
+                    level: section.level,
+                    data: JSON.stringify(translatedQuestions),
+                },
+            });
+
             res.status(200).json({
                 type: currentUnit.type,
-                data: translatedQuestions,
+                data: {
+                    id: data.id,
+                    questions: translatedQuestions,
+                },
             });
         } catch (error) {
             console.error(error);

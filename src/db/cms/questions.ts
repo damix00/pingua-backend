@@ -166,18 +166,6 @@ export async function translateQuestions(
     const courseLanguage = course.languageCode;
     const appLanguage = course.appLanguageCode;
 
-    // await Promise.all(
-    //     currentUnit.questions.map(async (question, i) => {
-    //         const translatedQuestion = await handleQuestion(
-    //             question,
-    //             courseLanguage,
-    //             appLanguage
-    //         );
-
-    //         translatedQuestions[i] = translatedQuestion;
-    //     })
-    // );
-
     for (let i = 0; i < currentUnit.questions.length; i++) {
         const question = currentUnit.questions[i];
         const translatedQuestion = await handleQuestion(
