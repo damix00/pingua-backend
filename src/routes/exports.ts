@@ -6,10 +6,9 @@ import refreshToken from "./v1/auth/refresh-token";
 import register from "./v1/auth/register";
 import sendMessage from "./v1/chats/[chat_id]/messages/_post";
 import handleChats from "./v1/chats/handler";
-import createLesson from "./v1/courses/[courseId]/lessons/_post";
 import translate from "./v1/translations/_post";
 import handleMessages from "./v1/chats/[chat_id]/messages/[message_id]/handler";
-import updateLesson from "./v1/courses/[courseId]/lessons/[lessonId]/_patch";
+import router from "./v1/courses/[courseId]/handler";
 
 export type route = {
     router: Router;
@@ -38,10 +37,6 @@ export const routes: route[] = [
         basePath: "/v1/auth",
     },
     {
-        router: createLesson,
-        basePath: "/v1/courses",
-    },
-    {
         router: sendMessage,
         basePath: "/v1/chats",
     },
@@ -58,7 +53,7 @@ export const routes: route[] = [
         basePath: "/v1/chats/",
     },
     {
-        router: updateLesson,
-        basePath: "/v1/courses/",
+        router: router,
+        basePath: "/v1/courses",
     },
 ];

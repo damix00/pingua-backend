@@ -57,7 +57,7 @@ export async function getTranslation(
         return cached;
     }
 
-    console.log("CACHE MISS");
+    console.log("CACHE MISS", text, cached);
 
     const response = await translate(text, toLanguage, fromLanguage);
 

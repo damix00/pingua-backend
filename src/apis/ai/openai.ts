@@ -1,6 +1,9 @@
 import OpenAI from "openai";
 import { languageCodeMap } from "../../utils/util";
 import config from "../../utils/config";
+import { Stream } from "stream";
+import { z } from "zod";
+import { zodResponseFormat } from "openai/helpers/zod";
 
 const openai = new OpenAI({
     apiKey: config.get("OPENAI_API_KEY"),
@@ -130,4 +133,39 @@ Example response:
 
 You understand other languages but ONLY respond in ${language}. This is a chat conversation.`;
     }
+}
+
+export function transcribeText(file: any) {
+    return openai.audio.transcriptions.create({
+        file,
+        model: "whisper-1",
+    });
+}
+
+const comparisonSchema = z.object({
+    is_similar: z.boolean(),
+});
+
+export async function compareTexts(text1: string, text2: string) {
+    const data = await openai.beta.chat.completions.parse({
+        model: "gpt-4o-mini",
+        messages: [
+            {
+                role: "system",
+                content:
+                    "You are helping a language learner. You will be given two texts. Determine if they are similar enough to be considered the same. The meaning and wording need to be very close and they need to be in the same language. Text #2 is transcribed from a recording, so if there is 1 or 2 similiar sounding words, make them count because the model may be wrong.",
+            },
+            {
+                role: "user",
+                content: text1,
+            },
+            {
+                role: "user",
+                content: text2,
+            },
+        ],
+        response_format: zodResponseFormat(comparisonSchema, "similarity"),
+    });
+
+    return data.choices[0].message.parsed;
 }

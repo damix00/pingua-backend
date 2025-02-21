@@ -151,7 +151,7 @@ router.patch(
                 },
             });
 
-            res.status(503).json({
+            res.status(200).json({
                 message: "Lesson completed",
                 xp,
             });

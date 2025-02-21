@@ -1,6 +1,15 @@
 import { EXPIRY_TIME, redis } from "./redis";
-import { fetchLevelWithUnits, fetchSectionByLevel } from "../cms/cms";
-import { CMSSection, CMSUnit } from "../cms/cms-types";
+import {
+    fetchLevelWithUnits,
+    fetchQuestionById,
+    fetchSectionByLevel,
+} from "../cms/cms";
+import {
+    CMSQuestion,
+    CMSSection,
+    CMSUnit,
+    transformQuestion,
+} from "../cms/cms-types";
 
 export async function getSectionByLevel(level: number): Promise<
     | (CMSSection & {
@@ -56,4 +65,20 @@ export async function setLevelWithUnits(
     await redis.set(`section:${level}:units`, JSON.stringify(data), {
         EX: EXPIRY_TIME,
     });
+}
+
+export async function getQuestionById(id: string): Promise<CMSQuestion | null> {
+    const data = await redis.get(`question:${id}`);
+
+    if (data) {
+        return JSON.parse(data);
+    }
+
+    const result = await fetchQuestionById(id);
+
+    if (!result) {
+        return null;
+    }
+
+    return transformQuestion(result as any);
 }

@@ -13,6 +13,7 @@ import * as resend from "./apis/resend/resend";
 import * as db from "./db/prisma";
 import config from "./utils/config";
 import { initRedis } from "./db/redis/redis";
+import parser from "body-parser";
 
 // Load environment variables
 config.init();
@@ -27,6 +28,11 @@ initFirebase();
 
 // Initialize Resend API
 resend.init();
+
+app.use(parser.json({ limit: "200mb" }));
+app.use(parser.urlencoded({ limit: "200mb", extended: true }));
+app.use(parser.raw({ limit: "200mb" }));
+app.use(parser.text({ limit: "200mb" }));
 
 // File upload handler
 app.use(

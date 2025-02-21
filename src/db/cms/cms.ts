@@ -96,3 +96,13 @@ export async function fetchLevelWithUnits(level: number): Promise<
         units: transformUnits(json.docs),
     };
 }
+
+export async function fetchQuestionById(id: string): Promise<CMSUnit> {
+    const data = await fetch(
+        `${config.get("PAYLOAD_URL")}/api/questions/${id}`
+    );
+
+    const json = await data.json();
+
+    return json;
+}
