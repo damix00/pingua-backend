@@ -146,7 +146,7 @@ const comparisonSchema = z.object({
     is_similar: z.boolean(),
 });
 
-export async function compareTexts(text1: string, text2: string) {
+export async function compareTextsAudio(text1: string, text2: string) {
     const data = await openai.beta.chat.completions.parse({
         model: "gpt-4o-mini",
         messages: [
@@ -154,6 +154,34 @@ export async function compareTexts(text1: string, text2: string) {
                 role: "system",
                 content:
                     "You are helping a language learner. You will be given two texts. Determine if they are similar enough to be considered the same. The meaning and wording need to be very close and they need to be in the same language. Text #2 is transcribed from a recording, so if there is 1 or 2 similiar sounding words, make them count because the model may be wrong.",
+            },
+            {
+                role: "user",
+                content: text1,
+            },
+            {
+                role: "user",
+                content: text2,
+            },
+        ],
+        response_format: zodResponseFormat(comparisonSchema, "similarity"),
+    });
+
+    return data.choices[0].message.parsed;
+}
+
+export async function compareTranslatedTexts(
+    text1: string,
+    text2: string,
+    fromLanguage: string,
+    toLanguage: string
+) {
+    const data = await openai.beta.chat.completions.parse({
+        model: "gpt-4o-mini",
+        messages: [
+            {
+                role: "system",
+                content: `You are helping a language learner. You will be given two texts. Determine if they are similar enough to be considered the same. The meaning and wording need to be very close. Text #1 will always be in ${fromLanguage} and text #2 will always be in ${toLanguage}. If the language in text #2 is not ${toLanguage}, mark it as incorrect.`,
             },
             {
                 role: "user",

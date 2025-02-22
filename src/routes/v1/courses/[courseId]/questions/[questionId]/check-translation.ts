@@ -2,33 +2,23 @@ import { Response } from "express";
 import { ExtendedRequest } from "../../../../../../types/request";
 import { getQuestionById } from "../../../../../../db/redis/sections";
 import {
-    CMSQuestionRecordVoice,
+    CMSQuestionTranslate,
     CMSQuestionType,
 } from "../../../../../../db/cms/cms-types";
+import { compareTranslatedTexts } from "../../../../../../apis/ai/openai";
 import { getTranslation } from "../../../../../../db/redis/ai";
-import {
-    compareTextsAudio,
-    transcribeText,
-} from "../../../../../../apis/ai/openai";
-import fs from "fs";
 
 export default async (req: ExtendedRequest, res: Response) => {
     const { questionId, courseId } = req.params;
+    const { translation } = req.body;
 
-    const file: any = req.files?.recording;
     const question = req.query.text as string;
 
-    if (!file || !question) {
+    if (!translation || !question) {
         return res.status(400).json({
-            message: "Missing required fields",
+            message: "No translation provided",
         });
     }
-
-    const mvPath = `${file.tempFilePath}.${
-        file.name.split(".")[file.name.split(".").length - 1]
-    }`;
-
-    fs.renameSync(file.tempFilePath, mvPath);
 
     const course = req.courses.find((c) => c.id === courseId);
 
@@ -52,18 +42,26 @@ export default async (req: ExtendedRequest, res: Response) => {
             for (const q of questionCms.variations) {
                 if (
                     "questionType" in q &&
-                    q.questionType == CMSQuestionType.RecordVoice &&
+                    q.questionType == CMSQuestionType.Translate &&
                     q.question == question
                 ) {
                     questionText = q.question;
                     break;
                 }
             }
+
+            if (!questionText) {
+                return res.status(404).json({
+                    message: "Question not found",
+                });
+            }
         }
         if (
             "questionType" in questionCms &&
-            questionCms.questionType != CMSQuestionType.RecordVoice
+            questionCms.questionType != CMSQuestionType.Translate
         ) {
+            console.log("Invalid question type", questionCms.questionType);
+
             return res.status(400).json({
                 message: "Invalid question type",
             });
@@ -71,9 +69,9 @@ export default async (req: ExtendedRequest, res: Response) => {
 
         if (
             "questionType" in questionCms &&
-            questionCms.questionType == CMSQuestionType.RecordVoice
+            questionCms.questionType == CMSQuestionType.Translate
         ) {
-            questionText = (questionCms as any as CMSQuestionRecordVoice)
+            questionText = (questionCms as any as CMSQuestionTranslate)
                 .question;
         }
 
@@ -83,45 +81,32 @@ export default async (req: ExtendedRequest, res: Response) => {
             });
         }
 
-        // Translate the question to the course language
-        const translation = await getTranslation(
-            (questionCms as CMSQuestionRecordVoice).question,
-            course.languageCode
+        const result = await compareTranslatedTexts(
+            questionText,
+            req.body.translation,
+            "en",
+            course.appLanguageCode
         );
 
-        if (!translation) {
-            return res.status(500).json({
-                message: "Failed to translate",
-            });
+        let translation = questionText;
+
+        if (!result?.is_similar && course.appLanguageCode != "en") {
+            translation = await getTranslation(
+                questionText,
+                course.appLanguageCode,
+                "gpt-4o-mini",
+                "en"
+            );
         }
-
-        const fileData = fs.createReadStream(mvPath);
-
-        // Transcribe the text
-        const transcription = await transcribeText(fileData);
-
-        if (!transcription) {
-            return res.status(500).json({
-                message: "Failed to transcribe",
-            });
-        }
-
-        const similarity = await compareTextsAudio(
-            translation,
-            transcription.text
-        );
-
-        console.log(transcription.text);
 
         res.status(200).json({
-            question: translation,
-            transcription: transcription.text,
-            similarity: similarity?.is_similar,
+            similarity: result?.is_similar,
+            translation: result?.is_similar ? undefined : translation,
         });
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({
-            message: "Internal server error",
+    } catch (error) {
+        console.error("Failed to get question", error);
+        return res.status(500).json({
+            message: "Failed to get question",
         });
     }
 };

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getQuestionById } from "../../../../../../db/redis/sections";
 import speechRecognition from "./speech-recognition";
 import { ExtendedRequest } from "../../../../../../types/request";
+import checkTranslation from "./check-translation";
 
 const router = Router();
 
@@ -26,6 +27,11 @@ router.get(
 router.post(
     "/:courseId/questions/:questionId/speech-recognition",
     speechRecognition as any
+);
+
+router.post(
+    "/:courseId/questions/:questionId/check-translation",
+    checkTranslation as any
 );
 
 export default router;
