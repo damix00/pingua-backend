@@ -43,14 +43,15 @@ export default async (req: ExtendedRequest, res: Response) => {
                 if (
                     "questionType" in q &&
                     q.questionType == CMSQuestionType.Translate &&
-                    q.question == question
+                    (await getTranslation(q.question, course.languageCode)) ==
+                        question
                 ) {
                     questionText = q.question;
                     break;
                 }
             }
 
-            if (!questionText) {
+            if (questionText.length == 0) {
                 return res.status(404).json({
                     message: "Question not found",
                 });

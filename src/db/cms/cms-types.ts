@@ -5,7 +5,6 @@ export enum CMSQuestionType {
     ListenAndChoose = "listen-and-choose",
     RecordVoice = "record-voice",
     Translate = "translate",
-    TrueOrFalse = "true-or-false",
 }
 
 export enum AppCharacter {
@@ -96,19 +95,6 @@ export type CMSQuestionTranslate = {
     character: AppCharacter;
 };
 
-export type CMSQuestionTrueOrFalse = {
-    id: string;
-    question: string;
-    questionType: CMSQuestionType.TrueOrFalse;
-    isVariation: false;
-    answers: {
-        id: string;
-        answer: string;
-        correct: boolean;
-    }[];
-    character: AppCharacter;
-};
-
 export type CMSQuestion =
     | CMSQuestionMultipleChoice
     | CMSQuestionFlashcard
@@ -116,7 +102,6 @@ export type CMSQuestion =
     | CMSQuestionListenAndChoose
     | CMSQuestionRecordVoice
     | CMSQuestionTranslate
-    | CMSQuestionTrueOrFalse
     | {
           type: null;
           id: string;
@@ -128,7 +113,6 @@ export type CMSQuestion =
               | CMSQuestionListenAndChoose
               | CMSQuestionRecordVoice
               | CMSQuestionTranslate
-              | CMSQuestionTrueOrFalse
           )[];
       };
 
@@ -176,7 +160,7 @@ export function transformQuestion(question: CMSQuestion): any {
                 isVariation: question.isVariation,
                 variations: question.variations.map((variation) =>
                     // @ts-ignore
-                    transformQuestion(variation)
+                    transformQuestion({ ...variation, id: question.id })
                 ),
             };
         }
@@ -221,17 +205,6 @@ export function transformQuestion(question: CMSQuestion): any {
                         questionType: question.questionType,
                         question: question.question,
                         correctAnswer: question.correctAnswer,
-                    };
-                case CMSQuestionType.TrueOrFalse:
-                    return {
-                        id: question.id,
-                        questionType: question.questionType,
-                        question: question.question,
-                        answers: question.answers.map((answer) => ({
-                            id: answer.id,
-                            answer: answer.answer,
-                            correct: answer.correct,
-                        })),
                     };
             }
         }
