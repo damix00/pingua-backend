@@ -93,7 +93,9 @@ export async function fetchLevelWithUnits(level: number): Promise<
 
     return {
         ...transformSection(data),
-        units: transformUnits(json.docs),
+        units: transformUnits(
+            json.docs.filter((doc: any) => doc.section.level == level)
+        ),
     };
 }
 
@@ -105,4 +107,14 @@ export async function fetchQuestionById(id: string): Promise<CMSUnit> {
     const json = await data.json();
 
     return json;
+}
+
+export async function fetchSectionCount(): Promise<number> {
+    const data = await fetch(
+        `${config.get("PAYLOAD_URL")}/api/sections?limit=0`
+    );
+
+    const json = await data.json();
+
+    return json.docs.length;
 }

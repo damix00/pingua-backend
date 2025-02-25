@@ -1,3 +1,5 @@
+import { shuffleArray } from "../../utils/util";
+
 export enum CMSQuestionType {
     Flashcard = "flashcard",
     MultipleChoice = "multiple-choice",
@@ -173,11 +175,13 @@ export function transformQuestion(question: CMSQuestion): any {
                         id: question.id,
                         questionType: question.questionType,
                         question: question.question,
-                        answers: question.answers.map((answer) => ({
-                            id: answer.id,
-                            answer: answer.answer,
-                            correct: answer.correct,
-                        })),
+                        answers: shuffleArray(
+                            question.answers.map((answer) => ({
+                                id: answer.id,
+                                answer: answer.answer,
+                                correct: answer.correct,
+                            }))
+                        ),
                     };
                 case CMSQuestionType.Flashcard:
                     return {

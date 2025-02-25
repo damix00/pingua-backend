@@ -16,9 +16,9 @@ datasource db {
 
 enum Plan {
   FREE
-  BASIC
+  // BASIC
   PREMIUM
-  ULTRA
+  // ULTRA
 }
 
 model User {

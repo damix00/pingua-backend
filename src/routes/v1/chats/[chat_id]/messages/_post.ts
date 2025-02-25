@@ -9,6 +9,7 @@ import {
     sendMessage,
 } from "../../../../../apis/ai/openai";
 import { sleep } from "../../../../../utils/util";
+import OpenAI from "openai";
 
 const router = Router();
 
@@ -69,20 +70,8 @@ router.post(
                     .status(500)
                     .json({ message: "Failed to send message" });
             }
-
-            res.writeHead(200, {
-                "Content-Type": "text/event-stream",
-                "X-Accel-Buffering": "no",
-                "Transfer-Encoding": "chunked",
-                Connection: "keep-alive",
-                "Cache-Control": "no-cache",
-            });
-            res.flushHeaders();
-
-            res.write(JSON.stringify({ sent: true, id: sent.id }));
-
             // Stream AI response
-            const response = await sendMessage(
+            const response = (await sendMessage(
                 [
                     ...lastMessages.map((msg) => ({
                         role: (msg.userMessage ? "user" : "assistant") as any,
@@ -93,51 +82,28 @@ router.post(
                         content,
                     },
                 ],
-                getCharacterSystemMessage(chat.character as any, language)
-            );
+                getCharacterSystemMessage(chat.character as any, language),
+                false
+            )) as OpenAI.Chat.Completions.ChatCompletion;
 
-            let responseContent = "";
-            let messages = [];
+            const responseContent = response.choices[0].message.content;
 
-            let prevDelay = 0;
-
-            // The model will output <new-message /> to indicate a new message
-
-            for await (const chunk of response) {
-                const chunkData = chunk.choices[0]?.delta?.content;
-
-                if (!chunkData) {
-                    continue;
-                }
-
-                if (chunk.choices[0].finish_reason) {
-                    break;
-                }
-
-                responseContent += chunkData;
-
-                if (responseContent.includes("<new-message />")) {
-                    const content = responseContent
-                        .replace("<new-message />", "")
-                        .trim();
-                    messages.push(content);
-                    responseContent = "";
-                    res.write(JSON.stringify({ content }));
-                }
+            if (!responseContent) {
+                return res
+                    .status(500)
+                    .json({ message: "Failed to get response" });
             }
 
-            if (responseContent) {
-                messages.push(responseContent);
-                res.write(JSON.stringify({ content: responseContent }));
-            }
+            // Messages are split using <new-message /> tag
+            let messages = responseContent.split("<new-message />");
 
-            const msgs = [];
+            const dbMessages = [];
 
             // Save AI response
             for await (const message of messages) {
                 // We don't use saveMany because we want to save the messages in order
                 // with saveMany all messages are saved at the same time and the order is not guaranteed
-                msgs.push(
+                dbMessages.push(
                     await prisma.aIConversationMessage.create({
                         data: {
                             content: message,
@@ -148,11 +114,9 @@ router.post(
                 );
             }
 
-            res.write(
-                JSON.stringify({ finished: true, messages: msgs.reverse() })
-            );
-
-            res.end();
+            res.status(200).json({
+                messages: [...dbMessages.reverse(), sent],
+            });
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal Server Error" });

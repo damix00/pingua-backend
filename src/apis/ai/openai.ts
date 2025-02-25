@@ -80,7 +80,8 @@ For additional context, you will be provided with the <context></context> tags.`
 
 export async function sendMessage(
     context: { content: string; role: "user" | "assistant" }[],
-    systemMessage: string
+    systemMessage: string,
+    stream: boolean = false
 ) {
     return await openai.chat.completions.create({
         model: "gpt-4o",
@@ -91,7 +92,7 @@ export async function sendMessage(
             },
             ...context,
         ],
-        stream: true,
+        stream,
     });
 }
 

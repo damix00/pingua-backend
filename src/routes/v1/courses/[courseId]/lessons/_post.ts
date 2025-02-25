@@ -11,7 +11,6 @@ import { prisma } from "../../../../../db/prisma";
 import { getTranslation } from "../../../../../db/redis/ai";
 
 const router = Router();
-router.use(authorize as any);
 
 router.post(
     "/:courseId/lessons",
@@ -44,7 +43,6 @@ router.post(
 
             // Generate a new lesson based on the current state
             // Get the current unit for the user's level and XP
-
             const sectionCmsData = await fetchLevelWithUnits(section.level);
 
             const currentUnit = sectionCmsData?.units.find(

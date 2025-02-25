@@ -3,6 +3,7 @@ import {
     fetchLevelWithUnits,
     fetchQuestionById,
     fetchSectionByLevel,
+    fetchSectionCount,
 } from "../cms/cms";
 import {
     CMSQuestion,
@@ -81,4 +82,20 @@ export async function getQuestionById(id: string): Promise<CMSQuestion | null> {
     }
 
     return transformQuestion(result as any);
+}
+
+export async function getSectionCount(): Promise<number> {
+    const data = await redis.get("section:count");
+
+    if (data) {
+        return parseInt(data);
+    }
+
+    const result = await fetchSectionCount();
+
+    if (!result) {
+        return 1;
+    }
+
+    return result;
 }

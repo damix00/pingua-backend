@@ -5,7 +5,7 @@ import { Response, Router } from "express";
 import { ExtendedRequest } from "../../../types/request";
 import { authorize } from "../../../middleware/auth";
 import { toAuthCourse, toAuthUser } from "../../../db/transformators/user";
-import { getSectionByLevel } from "../../../db/redis/sections";
+import { getSectionByLevel, getSectionCount } from "../../../db/redis/sections";
 
 const router = Router();
 
@@ -30,6 +30,7 @@ router.get(
             user: toAuthUser(req.user),
             courses: req.courses.map(toAuthCourse),
             section_data: sections,
+            section_count: await getSectionCount(),
         });
     }
 );

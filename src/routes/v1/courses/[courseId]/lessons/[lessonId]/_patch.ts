@@ -4,6 +4,7 @@ import { ExtendedRequest } from "../../../../../../types/request";
 import { prisma } from "../../../../../../db/prisma";
 import { fetchLevelWithUnits } from "../../../../../../db/cms/cms";
 import { clamp } from "../../../../../../utils/util";
+import { getSectionCount } from "../../../../../../db/redis/sections";
 
 const router = Router();
 router.use(authorize as any);
@@ -53,7 +54,7 @@ router.patch(
                 (unit, index) => (index + 1) * 10 > course.xp
             );
 
-            if (!currentUnitData) {
+            if (!currentUnitData || !sectionCmsData) {
                 return res.status(404).json({
                     message: "No unit found",
                 });
@@ -65,9 +66,9 @@ router.patch(
             const xp = Math.min(
                 xpToNextLvl,
                 clamp(
-                    10 - mistakes,
-                    5,
-                    currentUnitData?.max_completion_xp || 10
+                    currentUnitData.max_completion_xp - mistakes,
+                    Math.min(xpToNextLvl, 2),
+                    Math.min(xpToNextLvl, currentUnitData.max_completion_xp)
                 )
             );
 
@@ -129,18 +130,56 @@ router.patch(
                 });
             }
 
+            let advancedToNextSection = false;
+
+            if (
+                sectionCmsData.units.length * 10 <= course.xp + xp &&
+                (await getSectionCount()) > course.section.level
+            ) {
+                advancedToNextSection = true;
+
+                const newSection = await prisma.section.create({
+                    data: {
+                        courseId: course.id,
+                        finished: false,
+                        level: course.section.level + 1,
+                        accessible: true,
+                    },
+                });
+
+                if (!newSection) {
+                    return res.status(500).json({
+                        message: "Failed to create new section",
+                    });
+                }
+
+                await prisma.section.update({
+                    where: {
+                        id: course.section.id,
+                    },
+                    data: {
+                        finished: true,
+                    },
+                });
+            }
+
             await prisma.course.update({
                 where: {
                     id: courseId,
                 },
                 data: {
-                    xp: {
-                        increment: xp,
+                    xp: advancedToNextSection
+                        ? 0
+                        : {
+                              increment: xp,
+                          },
+                    level: {
+                        increment: advancedToNextSection ? 1 : 0,
                     },
                 },
             });
 
-            const result = await prisma.user.update({
+            await prisma.user.update({
                 where: {
                     id: req.user.id,
                 },
@@ -154,6 +193,7 @@ router.patch(
             res.status(200).json({
                 message: "Lesson completed",
                 xp,
+                advancedToNextSection,
             });
         } catch (error) {
             console.error(error);

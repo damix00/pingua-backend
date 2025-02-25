@@ -7,7 +7,6 @@ import {
     CMSQuestionMultipleChoice,
     CMSQuestionRecordVoice,
     CMSQuestionTranslate,
-    CMSQuestionTrueOrFalse,
     CMSQuestionType,
     CMSUnit,
 } from "./cms-types";
@@ -125,24 +124,6 @@ export async function handleQuestion(
                     id: question.id,
                     type: "translate",
                     question: await getTranslation(q.question, courseLanguage),
-                };
-
-            case CMSQuestionType.TrueOrFalse:
-                q = question as any as CMSQuestionTrueOrFalse;
-
-                return {
-                    id: question.id,
-                    type: "true-or-false",
-                    question: await getTranslation(q.question, courseLanguage),
-                    answers: await Promise.all(
-                        q.answers.map(async (answer) => ({
-                            answer: await getTranslation(
-                                answer.answer,
-                                appLanguage
-                            ),
-                            correct: answer.correct,
-                        }))
-                    ),
                 };
 
             default:
