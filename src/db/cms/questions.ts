@@ -18,7 +18,7 @@ export async function handleQuestion(
     courseLanguage: string,
     appLanguage: string
 ): Promise<any> {
-    if (question.isVariation) {
+    if ("isVariation" in question && question?.isVariation) {
         // Select random question from variations
         const variation = randomItem(question.variations);
 
@@ -140,15 +140,18 @@ export async function translateQuestions(
         throw new Error("Unit is not a questions unit");
     }
 
+    const filteredQuestions = currentUnit.questions.filter((q) => !!q);
+
     const translatedQuestions: any[] = Array.from({
-        length: currentUnit.questions.length,
+        length: filteredQuestions.length,
     });
 
     const courseLanguage = course.languageCode;
     const appLanguage = course.appLanguageCode;
 
-    for (let i = 0; i < currentUnit.questions.length; i++) {
-        const question = currentUnit.questions[i];
+    for (let i = 0; i < filteredQuestions.length; i++) {
+        const question = filteredQuestions[i];
+
         const translatedQuestion = await handleQuestion(
             question,
             courseLanguage,
