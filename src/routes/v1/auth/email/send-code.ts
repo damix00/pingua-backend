@@ -80,14 +80,14 @@ router.post(
 
             console.log(`Verification code for ${email}: ${code}`);
 
-            // const response = await resend.emails.send({
-            //     from: "noreply@notifications.latinary.com",
-            //     to: [email],
-            //     subject: "Your Pingua verification code",
-            //     html: generateTemplate("verification-code.html", {
-            //         code: code,
-            //     }),
-            // });
+            const response = await resend.emails.send({
+                from: "noreply@notifications.latinary.com",
+                to: [email],
+                subject: "Your Pingua verification code",
+                html: generateTemplate("verification-code.html", {
+                    code: code,
+                }),
+            });
 
             const response = {
                 error: false,
