@@ -17,7 +17,7 @@ export async function handleQuestion(
     question: CMSQuestion,
     courseLanguage: string,
     appLanguage: string
-) {
+): Promise<any> {
     if (question.isVariation) {
         // Select random question from variations
         const variation = randomItem(question.variations);

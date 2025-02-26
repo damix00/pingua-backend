@@ -6,7 +6,6 @@ import os from "os";
 import fileUpload from "express-fileupload";
 import { createServer } from "http";
 import logger from "./middleware/logger";
-import initFirebase from "./apis/firebase/config";
 import userAgent from "./middleware/user-agent";
 import { routes } from "./routes/exports";
 import * as resend from "./apis/resend/resend";
@@ -22,9 +21,6 @@ const app = express();
 const server = createServer(app);
 
 const PORT = config.get("PORT") || 9500;
-
-// Initialize Firebase
-initFirebase();
 
 // Initialize Resend API
 resend.init();
