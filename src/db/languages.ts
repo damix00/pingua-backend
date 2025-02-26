@@ -2,16 +2,13 @@ const supportedLanguages = [
     "en",
     "de",
     "hr",
-    // "es",
-    // "fr",
-    // "it",
-    // "ru",
-    // "pt",
-    // "tr",
-    // "el",
-    // "nl",
-    // "pl",
-    // "sv",
+    "es",
+    "fr",
+    "it",
+    "pt",
+    "nl",
+    "pl",
+    "sv",
 ];
 
 function isSupportedLanguage(lang: string): boolean {

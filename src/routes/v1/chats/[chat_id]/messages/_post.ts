@@ -95,7 +95,9 @@ router.post(
             }
 
             // Messages are split using <new-message /> tag
-            let messages = responseContent.split("<new-message />");
+            let messages = responseContent
+                .split("<new-message />")
+                .map((msg) => msg.trim());
 
             const dbMessages = [];
 

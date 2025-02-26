@@ -15,6 +15,7 @@ import {
 export async function getSectionByLevel(level: number): Promise<
     | (CMSSection & {
           unitCount: number;
+          unitTitles: { [key: string]: string }[];
       })
     | null
 > {

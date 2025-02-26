@@ -148,18 +148,6 @@ router.post(
                 message: "User created successfully",
                 jwt,
                 user: toAuthUser(user),
-                courses: [
-                    toAuthCourse({
-                        ...course,
-                        section: sections,
-                    }),
-                ],
-                section_data: [
-                    {
-                        course_id: course.id,
-                        ...(await getSectionByLevel(1)),
-                    },
-                ],
             });
         } catch (error) {
             console.error(error);

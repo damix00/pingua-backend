@@ -6,6 +6,7 @@ import { ExtendedRequest } from "../../../types/request";
 import { authorize } from "../../../middleware/auth";
 import { toAuthCourse, toAuthUser } from "../../../db/transformators/user";
 import { getSectionByLevel, getSectionCount } from "../../../db/redis/sections";
+import { getTranslation } from "../../../db/redis/ai";
 
 const router = Router();
 
@@ -20,9 +21,32 @@ router.get(
         for (const course of req.courses) {
             const section = await getSectionByLevel(course.level);
 
+            let titles = [];
+
+            for (const title of section?.unitTitles ?? []) {
+                titles.push({
+                    ...title,
+                    title:
+                        course.appLanguageCode == "en"
+                            ? title.title
+                            : await getTranslation(
+                                  title.title,
+                                  course.appLanguageCode
+                              ),
+                });
+            }
+
             sections.push({
-                course_id: course.id,
                 ...section,
+                unitTitles: titles,
+                course_id: course.id,
+                title:
+                    course.appLanguageCode == "en"
+                        ? section?.title
+                        : await getTranslation(
+                              section?.title ?? "",
+                              course.appLanguageCode
+                          ),
             });
         }
 

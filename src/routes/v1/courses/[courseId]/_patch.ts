@@ -2,23 +2,23 @@ import { Response } from "express";
 import { ExtendedRequest } from "../../../../types/request";
 import { prisma } from "../../../../db/prisma";
 import { toAuthCourse } from "../../../../db/transformators/user";
+import { isSupportedLanguage } from "../../../../db/languages";
 
 export default async (req: ExtendedRequest, res: Response) => {
     try {
-        const { app_language } = req.body;
-
-        if (!app_language) {
-            return res.status(400).send({
-                message: "app_language is required",
-            });
-        }
+        const { app_language, course_language } = req.body;
 
         const course = await prisma.course.update({
             where: {
                 id: req.params.courseId,
             },
             data: {
-                appLanguageCode: app_language,
+                appLanguageCode: isSupportedLanguage(app_language)
+                    ? app_language
+                    : undefined,
+                languageCode: isSupportedLanguage(course_language)
+                    ? course_language
+                    : undefined,
             },
             include: {
                 sections: {
