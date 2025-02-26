@@ -29,7 +29,7 @@ const checkParam = async (
             },
         });
 
-        if (!message) {
+        if (!message || message.conversation.userId != req.user.id) {
             res.status(404).json({
                 message: "Message not found",
             });

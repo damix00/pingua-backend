@@ -10,8 +10,11 @@ import {
 } from "../../../../../apis/ai/openai";
 import { sleep } from "../../../../../utils/util";
 import OpenAI from "openai";
+import { authorize } from "../../../../../middleware/auth";
 
 const router = Router();
+
+router.use(authorize as any);
 
 router.post(
     "/:id/messages",
@@ -28,6 +31,7 @@ router.post(
             const chat = await prisma.aIConversation.findUnique({
                 where: {
                     id,
+                    userId: req.user.id,
                 },
             });
 
