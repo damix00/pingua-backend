@@ -5,8 +5,10 @@ COPY . /app
 WORKDIR /app
 
 # install dependencies
+RUN npm install -g typescript prisma
+
+RUN npx prisma generate
 RUN npm install
-RUN npm install -g typescript
 
 # expose the port
 EXPOSE 9500
