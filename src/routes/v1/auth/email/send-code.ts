@@ -6,6 +6,7 @@ import { ExtendedRequest } from "../../../../types/request";
 import { getRandomInt } from "../../../../utils/crypto";
 import { prisma } from "../../../../db/prisma";
 import { VerificationStatus } from "@prisma/client";
+import { generateTemplate, resend } from "../../../../apis/resend/resend";
 
 async function generateCode(
     email: string,
@@ -88,10 +89,6 @@ router.post(
                     code: code,
                 }),
             });
-
-            const response = {
-                error: false,
-            };
 
             if (response?.error) {
                 res.status(500).json({
