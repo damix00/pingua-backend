@@ -13,6 +13,7 @@ export async function authorize(
     const token = req.headers.authorization;
 
     if (!token) {
+        console.log("Missing token");
         return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -20,6 +21,8 @@ export async function authorize(
         const data = await verifyUser(token);
 
         if (!data) {
+            console.log("Invalid token");
+
             return res.status(401).json({ error: "Unauthorized" });
         }
 

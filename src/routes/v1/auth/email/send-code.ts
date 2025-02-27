@@ -7,6 +7,7 @@ import { getRandomInt } from "../../../../utils/crypto";
 import { prisma } from "../../../../db/prisma";
 import { VerificationStatus } from "@prisma/client";
 import { generateTemplate, resend } from "../../../../apis/resend/resend";
+import config from "../../../../utils/config";
 
 async function generateCode(
     email: string,
@@ -81,14 +82,17 @@ router.post(
 
             console.log(`Verification code for ${email}: ${code}`);
 
-            const response = await resend.emails.send({
-                from: "noreply@notifications.latinary.com",
-                to: [email],
-                subject: "Your Pingua verification code",
-                html: generateTemplate("verification-code.html", {
-                    code: code,
-                }),
-            });
+            const response =
+                config.get("NODE_ENV") == "production"
+                    ? await resend.emails.send({
+                          from: "noreply@notifications.latinary.com",
+                          to: [email],
+                          subject: "Your Pingua verification code",
+                          html: generateTemplate("verification-code.html", {
+                              code: code,
+                          }),
+                      })
+                    : { error: false };
 
             if (response?.error) {
                 res.status(500).json({

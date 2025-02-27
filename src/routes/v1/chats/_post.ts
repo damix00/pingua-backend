@@ -8,6 +8,12 @@ import { prisma } from "../../../db/prisma";
 
 export default async (req: ExtendedRequest, res: Response) => {
     try {
+        if (req.user.plan == "FREE") {
+            return res
+                .status(402)
+                .json({ message: "Upgrade to use this feature" });
+        }
+
         const { character } = req.body;
 
         if (!character) {

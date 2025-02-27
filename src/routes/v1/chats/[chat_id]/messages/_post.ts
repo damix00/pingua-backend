@@ -21,6 +21,12 @@ router.post(
     // @ts-ignore
     async (req: ExtendedRequest, res: Response) => {
         try {
+            if (req.user.plan == "FREE") {
+                return res
+                    .status(402)
+                    .json({ message: "Upgrade to use this feature" });
+            }
+
             const { id } = req.params;
             const { content, language } = req.body;
 
