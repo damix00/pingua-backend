@@ -13,6 +13,7 @@ import * as db from "./db/prisma";
 import config from "./utils/config";
 import { initRedis } from "./db/redis/redis";
 import parser from "body-parser";
+import * as stripe from "./apis/stripe/stripe";
 
 // Load environment variables
 config.init();
@@ -25,10 +26,14 @@ const PORT = config.get("PORT") || 9500;
 // Initialize Resend API
 resend.init();
 
+// Initialize Stripe API
+stripe.init();
+
+app.use("/v1/subscriptions/webhook", express.raw({ type: "application/json" }));
+
 app.use(parser.json({ limit: "200mb" }));
 app.use(parser.urlencoded({ limit: "200mb", extended: true }));
 app.use(parser.raw({ limit: "200mb" }));
-app.use(parser.text({ limit: "200mb" }));
 
 // File upload handler
 app.use(

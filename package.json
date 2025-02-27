@@ -24,6 +24,7 @@
         "openai": "^4.77.0",
         "redis": "^4.7.0",
         "resend": "^4.0.1",
+        "stripe": "^17.7.0",
         "winston": "^3.17.0"
     },
     "devDependencies": {

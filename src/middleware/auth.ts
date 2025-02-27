@@ -45,7 +45,13 @@ export async function authorize(
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        req.user = user;
+        req.user = {
+            ...user,
+            plan:
+                user.planExpiresAt && user.planExpiresAt < new Date()
+                    ? "FREE"
+                    : user.plan,
+        };
         req.courses = user.courses.map((course) => ({
             ...course,
             section: course.sections[0],

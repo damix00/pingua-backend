@@ -8,7 +8,8 @@ import sendMessage from "./v1/chats/[chat_id]/messages/_post";
 import handleChats from "./v1/chats/handler";
 import translate from "./v1/translations/_post";
 import handleMessages from "./v1/chats/[chat_id]/messages/[message_id]/handler";
-import router from "./v1/courses/[courseId]/handler";
+import courses from "./v1/courses/[courseId]/handler";
+import subscriptions from "./v1/subscriptions/handler";
 
 export type route = {
     router: Router;
@@ -53,7 +54,11 @@ export const routes: route[] = [
         basePath: "/v1/chats/",
     },
     {
-        router: router,
+        router: courses,
         basePath: "/v1/courses",
+    },
+    {
+        router: subscriptions,
+        basePath: "/v1/subscriptions",
     },
 ];

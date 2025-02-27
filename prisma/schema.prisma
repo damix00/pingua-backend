@@ -30,6 +30,7 @@ model User {
   xp               Int       @default(0)
   plan             Plan      @default(FREE)
   planExpiresAt    DateTime?
+  subscriptionId   String?
   resetToken       String    @default(uuid())
   createdAt        DateTime  @default(now())
 
