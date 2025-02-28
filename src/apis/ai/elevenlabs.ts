@@ -37,7 +37,7 @@ export const voiceMap: Record<
         model: TTSModel.ElevenTurboV2,
     },
     "mr-jackson": {
-        voiceId: "Bjh5gxvjDIOKaVNd4cq1",
+        voiceId: "IKne3meq5aSn9XLyUdCD",
         model: TTSModel.ElevenTurboV2,
     },
 };
