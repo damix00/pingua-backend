@@ -82,7 +82,7 @@ async function start() {
 if (cluster.isMaster) {
     for (
         let i = 0;
-        i < (config.getBoolean("PRODUCTION_MODE") ? os.cpus().length : 1);
+        i < (config.get("NODE_ENV") == "production" ? os.cpus().length : 1);
         i++
     ) {
         cluster.fork();

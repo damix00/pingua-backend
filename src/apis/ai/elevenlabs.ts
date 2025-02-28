@@ -24,10 +24,6 @@ export const voiceMap: Record<
         voiceId: "Xb7hH8MSUJpSbSDYk0k2",
         model: TTSModel.ElevenTurboV2,
     },
-    glorp: {
-        voiceId: "2e8D5gM6IMuvQlz2BwM3",
-        model: TTSModel.ElevenTurboV2,
-    },
     sara: {
         voiceId: "vGQNBgLaiM3EdZtxIiuY",
         model: TTSModel.ElevenTurboV2,
@@ -38,6 +34,10 @@ export const voiceMap: Record<
     },
     fujio: {
         voiceId: "GBv7mTt0atIp3Br8iCZE",
+        model: TTSModel.ElevenTurboV2,
+    },
+    "mr-jackson": {
+        voiceId: "Bjh5gxvjDIOKaVNd4cq1",
         model: TTSModel.ElevenTurboV2,
     },
 };

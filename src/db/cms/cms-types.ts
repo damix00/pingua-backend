@@ -11,10 +11,10 @@ export enum CMSQuestionType {
 
 export enum AppCharacter {
     Penguin = "penguin",
-    Glorp = "glorp",
     Fujio = "fujio",
     Jaxon = "jaxon",
     Sara = "sara",
+    MrJackson = "mr-jackson",
 }
 
 export type CMSCharacter = "user" | "narrator" | AppCharacter;

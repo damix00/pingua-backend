@@ -3,8 +3,8 @@ import config from "../../utils/config";
 
 let redis: RedisClientType;
 
-// export const EXPIRY_TIME = 60 * 60 * 6; // 6H
-export const EXPIRY_TIME = 1;
+// 30 minutes
+export const EXPIRY_TIME = config.get("NODE_ENV") == "production" ? 60 * 30 : 1;
 
 export async function initRedis() {
     redis = createClient({

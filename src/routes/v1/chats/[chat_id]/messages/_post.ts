@@ -52,7 +52,7 @@ router.post(
                 orderBy: {
                     createdAt: "desc",
                 },
-                take: 10,
+                take: 20,
             });
 
             // Limit should be 25000 characters
