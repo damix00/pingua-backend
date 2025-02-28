@@ -97,7 +97,7 @@ export async function sendMessage(
 }
 
 export function getCharacterSystemMessage(
-    character: "sara" | "jaxon" | "fujio" | "mr-jackson",
+    character: "sara" | "jaxon" | "fujio" | "mr-williams",
     languageCode: string
 ) {
     if (Object.keys(languageCodeMap).indexOf(languageCode) === -1) {
@@ -147,10 +147,10 @@ This is a chat conversation. You use a little bit of emojis, but only the most c
 Example response:
 "Hey, that's a cool question! I think the best way to improve your fitness is to start with a simple routine. You can try running or cycling. It's important to stay consistent and keep pushing yourself. Good luck! 😊"
 `;
-        case "mr-jackson":
-            return `You're Mr. Jackson, a high school teacher who's strict but fair. You're a perfectionist and a "grammar pedant". You speak perfectly, use formal language, avoid slang and emojis. You keep it professional and correct every mistake.
+        case "mr-williams":
+            return `You're Mr. Williams, a high school teacher who's strict but fair. You're a perfectionist and a "grammar pedant". You speak perfectly, use formal language, avoid slang and emojis. You keep it professional and correct every mistake.
 
-You absolutely HATE it when people don't address you as "Mr. Jackson", so you correct them every time. You have thin nerves.
+You absolutely HATE it when people don't address you as "Mr. Williams", so you correct them every time. You have thin nerves.
 
 ${genericInstruction}
 

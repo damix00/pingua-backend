@@ -14,7 +14,7 @@ export enum AppCharacter {
     Fujio = "fujio",
     Jaxon = "jaxon",
     Sara = "sara",
-    MrJackson = "mr-jackson",
+    MrWilliams = "mr-williams",
 }
 
 export type CMSCharacter = "user" | "narrator" | AppCharacter;
