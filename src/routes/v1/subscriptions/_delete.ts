@@ -14,10 +14,7 @@ export default async (req: ExtendedRequest, res: Response) => {
             req.user.subscriptionId
         );
 
-        if (!stripeResult) {
-            res.status(500).json({ error: "Failed to cancel subscription" });
-            return;
-        }
+        console.log(stripeResult);
 
         const result = await prisma.user.update({
             where: {
