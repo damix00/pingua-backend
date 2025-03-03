@@ -12,6 +12,7 @@ import {
     transformQuestion,
 } from "../cms/cms-types";
 
+// Fetch a section by its level from Redis cache or CMS if not found in cache
 export async function getSectionByLevel(level: number): Promise<
     | (CMSSection & {
           unitCount: number;
@@ -30,6 +31,7 @@ export async function getSectionByLevel(level: number): Promise<
     return result;
 }
 
+// Set a section in Redis cache with an expiry time
 export async function setSection(section: CMSSection & { unitCount: number }) {
     await redis.set(`section:${section.level}`, JSON.stringify(section), {
         EX: EXPIRY_TIME,
@@ -39,6 +41,7 @@ export async function setSection(section: CMSSection & { unitCount: number }) {
     });
 }
 
+// Fetch a level with its units from Redis cache or CMS if not found in cache
 export async function getLevelWithUnits(level: number): Promise<
     | (CMSSection & {
           units: CMSUnit[];
@@ -60,6 +63,7 @@ export async function getLevelWithUnits(level: number): Promise<
     return result;
 }
 
+// Set a level with its units in Redis cache with an expiry time
 export async function setLevelWithUnits(
     level: number,
     data: CMSSection & { units: CMSUnit[] }
@@ -69,6 +73,7 @@ export async function setLevelWithUnits(
     });
 }
 
+// Fetch a question by its ID from Redis cache or CMS if not found in cache
 export async function getQuestionById(id: string): Promise<CMSQuestion | null> {
     const data = await redis.get(`question:${id}`);
 
@@ -85,6 +90,7 @@ export async function getQuestionById(id: string): Promise<CMSQuestion | null> {
     return transformQuestion(result as any);
 }
 
+// Fetch the count of sections from Redis cache or CMS if not found in cache
 export async function getSectionCount(): Promise<number> {
     const data = await redis.get("section:count");
 

@@ -1,3 +1,5 @@
+// Manages the Prisma connection
+
 import { PrismaClient } from "@prisma/client";
 
 export let prisma: PrismaClient;

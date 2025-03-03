@@ -1,3 +1,6 @@
+// PATCH /v1/courses/:courseId/lessons/:lessonId
+// Mark a lesson as completed and update the user's XP and course progress
+
 import { Response, Router } from "express";
 import { authorize } from "../../../../../../middleware/auth";
 import { ExtendedRequest } from "../../../../../../types/request";

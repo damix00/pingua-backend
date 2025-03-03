@@ -21,7 +21,7 @@ export const voiceMap: Record<
         model: TTSModel.ElevenTurboV2,
     },
     penguin: {
-        voiceId: "Xb7hH8MSUJpSbSDYk0k2",
+        voiceId: "chcMmmtY1cmQh2ye1oXi",
         model: TTSModel.ElevenTurboV2,
     },
     sara: {
@@ -33,11 +33,11 @@ export const voiceMap: Record<
         model: TTSModel.ElevenTurboV2,
     },
     fujio: {
-        voiceId: "GBv7mTt0atIp3Br8iCZE",
+        voiceId: "IAETYMYM3nJvjnlkVTKI",
         model: TTSModel.ElevenTurboV2,
     },
     "mr-williams": {
-        voiceId: "IKne3meq5aSn9XLyUdCD",
+        voiceId: "dUercWozs0yhe4xBCgZ0",
         model: TTSModel.ElevenTurboV2,
     },
 };
@@ -93,6 +93,9 @@ export async function tts(
 
     // If the response is not ok or has no body, throw an error
     if (!response.ok || response.body == null) {
+        console.log(response.status);
+        console.log(await response.json());
+
         throw new Error((await response.json()).detail || "Unknown error");
     }
 

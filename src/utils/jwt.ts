@@ -4,12 +4,14 @@ import { User } from "@prisma/client";
 
 const secret = config.get("JWT_SECRET");
 
+// Sign a payload with the secret and return the token
 export async function sign(payload: any): Promise<string> {
     return jwt.sign(payload, secret, {
         expiresIn: "180d",
     });
 }
 
+// Verify a token and return the payload
 export async function verify(token: string): Promise<any> {
     try {
         return jwt.verify(token, secret);

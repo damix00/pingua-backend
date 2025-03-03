@@ -20,6 +20,9 @@ export async function translate(
         return originalText;
     }
 
+    // We need to define the translation tool in the completion
+    // If the AI just responded with the translation, it could be vulnerable to prompt injection
+    // And without the function it doesn't want to translate anything remotely vulgar
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         tools: [
@@ -83,6 +86,7 @@ export async function sendMessage(
     systemMessage: string,
     stream: boolean = false
 ) {
+    // Send a message to GPT-4o
     return await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
@@ -96,6 +100,7 @@ export async function sendMessage(
     });
 }
 
+// Returns the system message for a character
 export function getCharacterSystemMessage(
     character: "sara" | "jaxon" | "fujio" | "mr-williams",
     languageCode: string
@@ -168,10 +173,12 @@ export function transcribeText(file: any) {
     });
 }
 
+// Create a schema for the comparison response
 const comparisonSchema = z.object({
     is_similar: z.boolean(),
 });
 
+// Compare two texts to see if they are similar - for the audio task
 export async function compareTextsAudio(text1: string, text2: string) {
     const data = await openai.beta.chat.completions.parse({
         model: "gpt-4o-mini",
@@ -196,6 +203,7 @@ export async function compareTextsAudio(text1: string, text2: string) {
     return data.choices[0].message.parsed;
 }
 
+// Compare two texts to see if they are similar - for the translation task
 export async function compareTranslatedTexts(
     text1: string,
     text2: string,

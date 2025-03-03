@@ -1,3 +1,5 @@
+// Type definitions for the CMS data
+
 import { shuffleArray } from "../../utils/util";
 
 export enum CMSQuestionType {

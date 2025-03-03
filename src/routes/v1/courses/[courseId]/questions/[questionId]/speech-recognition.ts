@@ -1,3 +1,5 @@
+// POST /v1/courses/:courseId/questions/:questionId/speech-recognition
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../../../../types/request";
 import { getQuestionById } from "../../../../../../db/redis/sections";

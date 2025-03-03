@@ -4,6 +4,7 @@ import path from "path";
 import { decode } from "base64-arraybuffer";
 import config from "../../utils/config";
 
+// Generate a random filename with the provided extension
 export async function getRandomFilename(
     extension: string,
     bucket: string = "lesson-data"
@@ -27,6 +28,7 @@ export async function getRandomFilename(
     } while (true);
 }
 
+// Upload a file to Supabase Storage
 export async function uploadFile(
     arrayBuffer: ArrayBuffer,
     extension: string,

@@ -1,3 +1,6 @@
+// POST /v1/chats/[chat_id]/messages/[message_id]/tts
+// Returns a URL to the generated TTS audio file for the message
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../../../../types/request";
 import { getTts } from "../../../../../../db/redis/ai";

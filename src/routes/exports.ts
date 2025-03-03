@@ -1,3 +1,7 @@
+// This file exports all routes in the server
+// Each route is a router object from express
+// The basePath is the base path for the route (app.use(basePath, router))
+
 import { Router } from "express";
 import sendCode from "./v1/auth/email/send-code";
 import verifyCode from "./v1/auth/email/verify";

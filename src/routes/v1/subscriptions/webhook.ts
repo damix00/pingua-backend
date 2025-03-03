@@ -1,3 +1,6 @@
+// POST /v1/subscriptions/webhook
+// Handles Stripe webhook events
+
 import { Request, Response } from "express";
 import { stripe } from "../../../apis/stripe/stripe";
 import config from "../../../utils/config";

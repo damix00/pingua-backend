@@ -1,3 +1,4 @@
+// Supported languages in the app
 const supportedLanguages = [
     "en",
     "de",

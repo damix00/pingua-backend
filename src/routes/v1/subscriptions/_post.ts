@@ -1,3 +1,6 @@
+// POST /v1/subscriptions
+// Creates a new subscription for the user and returns the checkout URL
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../types/request";
 import { stripe } from "../../../apis/stripe/stripe";

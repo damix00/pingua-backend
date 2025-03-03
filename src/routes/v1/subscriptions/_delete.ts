@@ -1,3 +1,6 @@
+// DELETE /v1/subscriptions
+// Cancels the user's subscription
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../types/request";
 import { prisma } from "../../../db/prisma";

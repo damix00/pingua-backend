@@ -21,7 +21,7 @@ export async function translateDialogue(
 
     const story = currentUnit.story;
 
-    const limit = pLimit(2); // ElevenLabs TTS has a limit of 2 concurrent requests
+    const limit = pLimit(3); // ElevenLabs TTS has a limit of 3 concurrent requests
 
     // Concurrently translate each line of dialogue, and store the result in the translatedLines array
     await Promise.all(

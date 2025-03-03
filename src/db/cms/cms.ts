@@ -7,6 +7,7 @@ import {
     transformUnits,
 } from "./cms-types";
 
+// Fetch all sections with additional unit count and titles
 export async function fetchSections(): Promise<
     (CMSSection & {
         unitCount: number;
@@ -29,6 +30,7 @@ export async function fetchSections(): Promise<
     }));
 }
 
+// Fetch a section by its level with additional unit count and titles
 export async function fetchSectionByLevel(level: number): Promise<
     | (CMSSection & {
           unitCount: number;
@@ -67,6 +69,7 @@ export async function fetchSectionByLevel(level: number): Promise<
     return parsed;
 }
 
+// Fetch a section by its level along with its units
 export async function fetchLevelWithUnits(level: number): Promise<
     | (CMSSection & {
           units: CMSUnit[];
@@ -99,6 +102,7 @@ export async function fetchLevelWithUnits(level: number): Promise<
     };
 }
 
+// Fetch a question by its ID
 export async function fetchQuestionById(id: string): Promise<CMSUnit> {
     const data = await fetch(
         `${config.get("PAYLOAD_URL")}/api/questions/${id}`
@@ -109,6 +113,7 @@ export async function fetchQuestionById(id: string): Promise<CMSUnit> {
     return json;
 }
 
+// Fetch the total count of sections
 export async function fetchSectionCount(): Promise<number> {
     const data = await fetch(
         `${config.get("PAYLOAD_URL")}/api/sections?limit=0`

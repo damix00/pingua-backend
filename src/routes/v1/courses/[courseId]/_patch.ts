@@ -1,3 +1,6 @@
+// PATCH /api/v1/courses/:courseId
+// Updates the course's app and course language
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../../types/request";
 import { prisma } from "../../../../db/prisma";

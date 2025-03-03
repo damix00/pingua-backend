@@ -1,3 +1,6 @@
+// Config file to call, because it ensures that dotenv is initialized
+// before any other file tries to access the environment variables.
+
 import dotenv from "dotenv";
 
 let cfg = false;

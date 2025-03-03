@@ -1,3 +1,6 @@
+// POST /v1/courses/:courseId/questions/:questionId/check-translation
+// Check if the translation of a question is correct
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../../../../types/request";
 import { getQuestionById } from "../../../../../../db/redis/sections";

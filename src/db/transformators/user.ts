@@ -1,3 +1,6 @@
+// user transformators:
+// This file contains functions that transform the data from the database to the format that the client expects.
+
 import { Course, Section, User } from "@prisma/client";
 
 export function toAuthUser(user: User) {

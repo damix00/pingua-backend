@@ -1,3 +1,6 @@
+// POST /v1/translations
+// Route for translating text from one language to another
+
 import { Router } from "express";
 import { authorize } from "../../../middleware/auth";
 import { getTranslation } from "../../../db/redis/ai";

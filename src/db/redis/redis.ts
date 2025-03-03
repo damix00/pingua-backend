@@ -3,7 +3,7 @@ import config from "../../utils/config";
 
 let redis: RedisClientType;
 
-// 30 minutes
+// 30 minutes in production, 1 second in development for testing
 export const EXPIRY_TIME = config.get("NODE_ENV") == "production" ? 60 * 30 : 1;
 
 export async function initRedis() {

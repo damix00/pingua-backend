@@ -9,6 +9,7 @@ export function init() {
     resend = new Resend(config.get("RESEND_API_KEY"));
 }
 
+// Generate an email template with the provided parameters, from the file
 export function generateTemplate(file: string, params: Record<string, string>) {
     const template = fs.readFileSync(
         path.join(__dirname, "../../../emails", file),

@@ -80,7 +80,7 @@ router.post(
                     .status(500)
                     .json({ message: "Failed to send message" });
             }
-            // Stream AI response
+
             const response = (await sendMessage(
                 [
                     ...lastMessages.map((msg) => ({
