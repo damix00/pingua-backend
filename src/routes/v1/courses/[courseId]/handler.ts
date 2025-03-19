@@ -4,12 +4,14 @@ import questionHandler from "./questions/[questionId]/handler";
 import createLesson from "./lessons/_post";
 import patchLesson from "./lessons/[lessonId]/_patch";
 import patchCourse from "./_patch";
+import scenariosHandler from "./scenarios/handler";
 
 const router = Router();
 
 router.use("/:courseId", authorize as any);
 
 router.use("/", questionHandler);
+router.use("/:courseId/scenarios", scenariosHandler);
 router.use("/", createLesson);
 router.use("/", patchLesson);
 router.patch("/:courseId", patchCourse as any);

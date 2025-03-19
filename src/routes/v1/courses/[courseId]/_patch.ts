@@ -14,6 +14,7 @@ export default async (req: ExtendedRequest, res: Response) => {
         const course = await prisma.course.update({
             where: {
                 id: req.params.courseId,
+                userId: req.user.id,
             },
             data: {
                 appLanguageCode: isSupportedLanguage(app_language)

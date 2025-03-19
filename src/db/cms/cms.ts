@@ -1,6 +1,7 @@
 import config from "../../utils/config";
 import { getSectionByLevel, setSection } from "../redis/sections";
 import {
+    CMSDialogueTheme,
     CMSSection,
     CMSUnit,
     transformSection,
@@ -122,4 +123,17 @@ export async function fetchSectionCount(): Promise<number> {
     const json = await data.json();
 
     return json.docs.length;
+}
+
+// Fetch dialogue themes
+export async function fetchDialogueThemes(): Promise<CMSDialogueTheme[]> {
+    const data = await fetch(
+        `${config.get(
+            "PAYLOAD_URL"
+        )}/api/dialogue-themes?limit=0&sort=createdAt`
+    );
+
+    const json = await data.json();
+
+    return json.docs;
 }

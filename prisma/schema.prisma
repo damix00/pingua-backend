@@ -41,6 +41,7 @@ model User {
 
   courses          Course[]
   aiConversations  AIConversation[]
+  aiScenarios      AIScenario[]
 }
 
 // Auth
@@ -75,6 +76,7 @@ model Course {
   
   user User @relation(fields: [userId], references: [id])
   sections Section[]
+  aiScenarios AIScenario[]
 }
 
 model Section {
@@ -172,4 +174,28 @@ model AIConversationMessage {
 
   conversation AIConversation @relation(fields: [conversationId], references: [id])
   attachments Attachment[]
+}
+
+model AIScenario {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  cmsId String @unique
+  userId String @db.ObjectId
+  courseId String @db.ObjectId
+  completed Boolean
+
+  user User @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  messages AIScenarioMessage[]
+}
+
+model AIScenarioMessage {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  scenarioId String @db.ObjectId
+  userMessage Boolean
+  content String
+
+  createdAt DateTime @default(now())
+
+  scenario AIScenario @relation(fields: [scenarioId], references: [id])
 }

@@ -19,6 +19,15 @@ export enum AppCharacter {
     MrWilliams = "mr-williams",
 }
 
+export type CMSDialogueTheme = {
+    title: string;
+    description: string;
+    imageUrl: string;
+    aiRole: string;
+    aiVoice: string;
+    type: "beginner" | "intermediate" | "advanced" | "fluent";
+};
+
 export type CMSCharacter = "user" | "narrator" | AppCharacter;
 
 export type CMSUnitStory = {

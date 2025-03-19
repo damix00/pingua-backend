@@ -1,11 +1,13 @@
 import { EXPIRY_TIME, redis } from "./redis";
 import {
+    fetchDialogueThemes,
     fetchLevelWithUnits,
     fetchQuestionById,
     fetchSectionByLevel,
     fetchSectionCount,
 } from "../cms/cms";
 import {
+    CMSDialogueTheme,
     CMSQuestion,
     CMSSection,
     CMSUnit,
@@ -103,6 +105,34 @@ export async function getSectionCount(): Promise<number> {
     if (!result) {
         return 1;
     }
+
+    return result;
+}
+
+// Set dialogue themes in Redis cache with an expiry time
+export async function setDialogueThemes(
+    themes: CMSDialogueTheme[]
+): Promise<void> {
+    await redis.set("dialogue-themes", JSON.stringify(themes), {
+        EX: EXPIRY_TIME,
+    });
+}
+
+// Get dialogue themes
+export async function getDialogueThemes(): Promise<CMSDialogueTheme[]> {
+    const data = await redis.get("dialogue-themes");
+
+    if (data) {
+        return JSON.parse(data);
+    }
+
+    const result = await fetchDialogueThemes();
+
+    if (!result) {
+        return [];
+    }
+
+    await setDialogueThemes(result);
 
     return result;
 }
