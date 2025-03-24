@@ -181,7 +181,9 @@ model AIScenario {
   cmsId String @unique
   userId String @db.ObjectId
   courseId String @db.ObjectId
-  completed Boolean
+  completed Boolean @default(false) // Whether the scenario has been completed
+  success Boolean @default(false) // Whether the user has successfully completed the scenario
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
   course Course @relation(fields: [courseId], references: [id])

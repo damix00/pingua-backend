@@ -11,7 +11,7 @@ const router = Router();
 router.use("/:courseId", authorize as any);
 
 router.use("/", questionHandler);
-router.use("/:courseId/scenarios", scenariosHandler);
+router.use("/", scenariosHandler);
 router.use("/", createLesson);
 router.use("/", patchLesson);
 router.patch("/:courseId", patchCourse as any);

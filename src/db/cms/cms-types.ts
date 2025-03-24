@@ -20,6 +20,7 @@ export enum AppCharacter {
 }
 
 export type CMSDialogueTheme = {
+    id: string;
     title: string;
     description: string;
     imageUrl: string;

@@ -6,6 +6,6 @@ const router = Router();
 
 router.use(authorize as any);
 
-router.get("/", _get as any);
+router.get("/:courseId/scenarios", _get as any);
 
 export default router;
