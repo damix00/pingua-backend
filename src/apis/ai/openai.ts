@@ -84,11 +84,13 @@ For additional context, you will be provided with the <context></context> tags.`
 export async function sendMessage(
     context: { content: string; role: "user" | "assistant" }[],
     systemMessage: string,
-    stream: boolean = false
+    stream: boolean = false,
+    shouldReason: boolean = false
 ) {
     // Send a message to GPT-4o
     return await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: shouldReason ? "o1" : "gpt-4o",
+        reasoning_effort: shouldReason ? "medium" : undefined,
         messages: [
             {
                 role: "system",

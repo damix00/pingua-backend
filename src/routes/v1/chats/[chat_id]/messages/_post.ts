@@ -28,7 +28,7 @@ router.post(
             }
 
             const { id } = req.params;
-            const { content, language } = req.body;
+            const { content, language, should_reason } = req.body;
 
             if (!content) {
                 return res.status(400).json({ error: "Content is required" });
@@ -48,12 +48,16 @@ router.post(
             const lastMessages = await prisma.aIConversationMessage.findMany({
                 where: {
                     conversationId: id,
+                    // The LLM doesn't really need to see its own messages, so we can exclude them
+                    userMessage: true,
                 },
                 orderBy: {
                     createdAt: "desc",
                 },
-                take: 20,
+                take: 50,
             });
+
+            lastMessages.reverse();
 
             // Limit should be 25000 characters
             const maxCharacterLimit = 25000;
@@ -93,7 +97,8 @@ router.post(
                     },
                 ],
                 getCharacterSystemMessage(chat.character as any, language),
-                false
+                false,
+                should_reason
             )) as OpenAI.Chat.Completions.ChatCompletion;
 
             const responseContent = response.choices[0].message.content;

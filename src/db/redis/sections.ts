@@ -136,3 +136,11 @@ export async function getDialogueThemes(): Promise<CMSDialogueTheme[]> {
 
     return result;
 }
+
+export async function getDialogueThemeById(
+    id: string
+): Promise<CMSDialogueTheme | null> {
+    const themes = await getDialogueThemes();
+
+    return themes.find((theme) => theme.id === id) || null;
+}

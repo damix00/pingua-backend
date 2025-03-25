@@ -24,7 +24,7 @@ export default async (req: ExtendedRequest, res: Response) => {
         const userId = req.user.id; // Assuming user ID is available in the request
         const scenarios = await prisma.aIScenario.findMany({
             where: { userId },
-            orderBy: { completed: "asc" },
+            orderBy: { createdAt: "desc" },
             distinct: ["cmsId"],
         });
 
@@ -66,6 +66,7 @@ export default async (req: ExtendedRequest, res: Response) => {
                     ...item,
                     title,
                     description,
+                    session_id: found?.id,
                     status: found
                         ? found.completed
                             ? "finished"
