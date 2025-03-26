@@ -4,6 +4,7 @@ import getScenarios from "./_get";
 import createScenarioSession from "./[scenarioId]/_post";
 import getScenarioMessages from "./[scenarioId]/[sessionId]/messages/_get";
 import createScenarioMessage from "./[scenarioId]/[sessionId]/messages/_post";
+import getHistory from "./[scenarioId]/history/_get";
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.post(
     "/:courseId/scenarios/:scenarioId/:sessionId/messages",
     createScenarioMessage as any
 );
+router.get("/:courseId/scenarios/:scenarioId/history", getHistory as any);
 
 export default router;

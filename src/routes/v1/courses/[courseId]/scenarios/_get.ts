@@ -3,6 +3,7 @@ import { ExtendedRequest } from "../../../../../types/request";
 import { getDialogueThemes } from "../../../../../db/redis/sections";
 import { prisma } from "../../../../../db/prisma";
 import { getTranslation } from "../../../../../db/redis/ai";
+import { transformScenarios } from "../../../../../db/cms/scenarios";
 
 export default async (req: ExtendedRequest, res: Response) => {
     try {
@@ -24,56 +25,20 @@ export default async (req: ExtendedRequest, res: Response) => {
         const userId = req.user.id; // Assuming user ID is available in the request
         const scenarios = await prisma.aIScenario.findMany({
             where: { userId },
-            orderBy: { createdAt: "desc" },
+            orderBy: [
+                {
+                    completed: "asc", // false first
+                },
+                { createdAt: "desc" },
+            ],
             distinct: ["cmsId"],
         });
 
-        const result = await Promise.all(
-            data.map(async (item) => {
-                const found = scenarios.find(
-                    (scenario) => scenario.cmsId === item.id
-                );
-
-                if (filter == "finished" && !found?.completed) {
-                    return null;
-                }
-
-                if (filter == "unfinished" && (found?.completed || !found)) {
-                    return null;
-                }
-
-                if (filter == "not_started" && found) {
-                    return null;
-                }
-
-                const title =
-                    course.appLanguageCode == "en"
-                        ? item.title
-                        : await getTranslation(
-                              item.title,
-                              course.appLanguageCode
-                          );
-
-                const description =
-                    course.appLanguageCode == "en"
-                        ? item.description
-                        : await getTranslation(
-                              item.description,
-                              course.appLanguageCode
-                          );
-
-                return {
-                    ...item,
-                    title,
-                    description,
-                    session_id: found?.id,
-                    status: found
-                        ? found.completed
-                            ? "finished"
-                            : "started"
-                        : null,
-                };
-            })
+        const result = await transformScenarios(
+            data,
+            scenarios,
+            course,
+            filter
         );
 
         res.status(200).json({

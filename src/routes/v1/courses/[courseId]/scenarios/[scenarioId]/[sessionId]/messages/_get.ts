@@ -50,7 +50,7 @@ export default async (req: ExtendedRequest, res: Response) => {
                       id: messageOffset as string,
                   }
                 : undefined,
-            take: 5,
+            take: 25,
             skip: messageOffset ? 1 : 0,
         });
 
