@@ -66,7 +66,7 @@ router.patch(
             const xpToNextLvl = 10 - (course.xp % 10);
 
             // const xp = Math.min(xpToNextLvl, Math.max(10 - mistakes, 5));
-            const xp = Math.min(
+            let xp = Math.min(
                 xpToNextLvl,
                 clamp(
                     currentUnitData.max_completion_xp - mistakes,
@@ -193,10 +193,34 @@ router.patch(
                 },
             });
 
+            const shouldUpdateStreak =
+                !req.user.lastStreakUpdate ||
+                req.user.lastStreakUpdate.getDate() == new Date().getDate() - 1;
+
+            let streakUpdated = false;
+
+            if (shouldUpdateStreak) {
+                await prisma.user.update({
+                    where: {
+                        id: req.user.id,
+                    },
+                    data: {
+                        lastStreakUpdate: new Date(),
+                        currentStreak: (req.user.currentStreak ?? 0) + 1,
+                        longestStreak: Math.max(
+                            req.user.longestStreak ?? 0,
+                            (req.user.currentStreak ?? 0) + 1
+                        ),
+                    },
+                });
+                streakUpdated = true;
+            }
+
             res.status(200).json({
                 message: "Lesson completed",
                 xp,
                 advancedToNextSection,
+                updatedStreak: streakUpdated,
             });
         } catch (error) {
             console.error(error);

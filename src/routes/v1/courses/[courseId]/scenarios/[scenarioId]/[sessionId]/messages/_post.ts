@@ -6,11 +6,13 @@ import { ExtendedRequest } from "../../../../../../../../types/request";
 import { prisma } from "../../../../../../../../db/prisma";
 import { sendScenarioMessage } from "../../../../../../../../apis/ai/scenarios";
 import { getDialogueThemeById } from "../../../../../../../../db/redis/sections";
+import { getTts } from "../../../../../../../../db/redis/ai";
+import { AppCharacter } from "../../../../../../../../db/cms/cms-types";
 
 export default async (req: ExtendedRequest, res: Response) => {
     try {
         const { courseId, scenarioId, sessionId } = req.params;
-        const { content, use_reasoning } = req.body;
+        const { content, use_reasoning, auto_tts } = req.body;
 
         if (use_reasoning && req.user.plan == "FREE") {
             return res.status(403).json({
@@ -113,7 +115,39 @@ export default async (req: ExtendedRequest, res: Response) => {
             });
         }
 
+        let ttsUrl = null;
+
+        if (auto_tts && !newAiMessage.done) {
+            ttsUrl = await getTts(newAiMessage.content, {
+                language: course.languageCode,
+                character: cmsScenario.aiVoice as any,
+            });
+        }
+
         if (newAiMessage.done) {
+            const shouldUpdateStreak =
+                !req.user.lastStreakUpdate ||
+                req.user.lastStreakUpdate.getDate() == new Date().getDate() - 1;
+
+            let streakUpdated = false;
+
+            if (shouldUpdateStreak) {
+                await prisma.user.update({
+                    where: {
+                        id: req.user.id,
+                    },
+                    data: {
+                        lastStreakUpdate: new Date(),
+                        currentStreak: (req.user.currentStreak ?? 0) + 1,
+                        longestStreak: Math.max(
+                            req.user.longestStreak ?? 0,
+                            (req.user.currentStreak ?? 0) + 1
+                        ),
+                    },
+                });
+                streakUpdated = true;
+            }
+
             await prisma.aIScenario.update({
                 where: {
                     id: sessionId,
@@ -131,6 +165,7 @@ export default async (req: ExtendedRequest, res: Response) => {
                     completed: true,
                     success: newAiMessage.success,
                 },
+                updatedStreak: streakUpdated,
             });
 
             return;
@@ -147,9 +182,10 @@ export default async (req: ExtendedRequest, res: Response) => {
         res.status(200).json({
             scenario: {
                 ...scenario,
-                done: false,
+                completed: false,
                 messages: [aiMessage, newUserMessage],
             },
+            ttsUrl,
         });
     } catch (error) {
         console.error(error);

@@ -105,7 +105,8 @@ export async function sendMessage(
 // Returns the system message for a character
 export function getCharacterSystemMessage(
     character: "sara" | "jaxon" | "fujio" | "mr-williams",
-    languageCode: string
+    languageCode: string,
+    fluency: number = 1
 ) {
     if (Object.keys(languageCodeMap).indexOf(languageCode) === -1) {
         throw new Error("Language code is required");
@@ -114,6 +115,8 @@ export function getCharacterSystemMessage(
         languageCodeMap[languageCode as keyof typeof languageCodeMap];
 
     const genericInstruction = `You understand other languages but ONLY respond in ${language}, but you can respond in the user's language ONLY if they ask you to translate or explain a word but you must continue the conversation in ${language} after that.`;
+
+    const fluencyInstruction = `The user marked their fluency as ${fluency}/4, so adjust your language level accordingly. If the user is fluent, you can use more complex sentences and vocabulary. If the user is a beginner, use simple sentences and vocabulary.`;
 
     switch (character) {
         case "sara":
@@ -128,6 +131,7 @@ You're talking to a language learner, so keep it simple and clear.
 For multiple messages use "<new-message />". Don't overdo it.
 
 ${genericInstruction}
+${fluencyInstruction}
 
 Example response:
 "okay but your new jacket is actually so fire??<new-message />thrift finds always hit different 😭<new-message/>also, one of my cats just knocked my homework off the table… third time today. cats = chaos bosses 💅
@@ -137,6 +141,7 @@ Example response:
             return `You're Jaxon, a rising beat-boxer, talk with a little bit of slang but keep it in official language. You are a pop culture expert and you know everything about rap.
 
 ${genericInstruction}
+${fluencyInstruction}
 
 This is a chat conversation and you can use emojis, but don't overuse them.
 
@@ -148,6 +153,7 @@ Example response:
             return `You're Fujio, a samurai who's an expert in sports and fitness.
 
 ${genericInstruction}
+${fluencyInstruction}
 
 This is a chat conversation. You use a little bit of emojis, but only the most common ones, which are: 😂, 😊, 😍 and 🙁.
 
@@ -160,6 +166,7 @@ Example response:
 You absolutely HATE it when people don't address you as "Mr. Williams", so you correct them every time. You have thin nerves.
 
 ${genericInstruction}
+${fluencyInstruction}
 
 This is a chat conversation.
 

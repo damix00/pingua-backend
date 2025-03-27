@@ -11,6 +11,7 @@ import {
 import { sleep } from "../../../../../utils/util";
 import OpenAI from "openai";
 import { authorize } from "../../../../../middleware/auth";
+import { getTts } from "../../../../../db/redis/ai";
 
 const router = Router();
 
@@ -28,7 +29,15 @@ router.post(
             }
 
             const { id } = req.params;
-            const { content, language, should_reason } = req.body;
+            const { content, language, should_reason, fluency, auto_tts } =
+                req.body;
+
+            // fluceny is a number between 1-4
+            if (fluency && (fluency < 1 || fluency > 4)) {
+                return res.status(400).json({
+                    message: "Fluency must be between 1 and 4",
+                });
+            }
 
             if (!content) {
                 return res.status(400).json({ error: "Content is required" });
@@ -48,8 +57,6 @@ router.post(
             const lastMessages = await prisma.aIConversationMessage.findMany({
                 where: {
                     conversationId: id,
-                    // The LLM doesn't really need to see its own messages, so we can exclude them
-                    userMessage: true,
                 },
                 orderBy: {
                     createdAt: "desc",
@@ -96,7 +103,11 @@ router.post(
                         content,
                     },
                 ],
-                getCharacterSystemMessage(chat.character as any, language),
+                getCharacterSystemMessage(
+                    chat.character as any,
+                    language,
+                    fluency
+                ),
                 false,
                 should_reason
             )) as OpenAI.Chat.Completions.ChatCompletion;
@@ -116,6 +127,23 @@ router.post(
 
             const dbMessages = [];
 
+            let ttsUrl = null;
+
+            if (auto_tts) {
+                // Combine messages
+                let combined = "";
+
+                for (const message of messages) {
+                    combined += `${message}. `;
+                }
+
+                // Generate TTS for the combined message
+                ttsUrl = await getTts(combined, {
+                    character: chat.character as any,
+                    language,
+                });
+            }
+
             // Save AI response
             for await (const message of messages) {
                 // We don't use saveMany because we want to save the messages in order
@@ -133,6 +161,7 @@ router.post(
 
             res.status(200).json({
                 messages: [...dbMessages.reverse(), sent],
+                ttsUrl,
             });
         } catch (error) {
             console.error(error);

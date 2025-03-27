@@ -4,6 +4,13 @@
 import { Course, Section, User } from "@prisma/client";
 
 export function toAuthUser(user: User) {
+    // Streak expires after 36 hours of inactivity
+    const streak =
+        (user.lastStreakUpdate?.getTime() ?? 0) + 36 * 60 * 60 * 1000 >
+        Date.now()
+            ? user.currentStreak
+            : 0;
+
     return {
         id: user.id,
         avatar: user.avatar,
@@ -13,6 +20,11 @@ export function toAuthUser(user: User) {
         xp: user.xp,
         plan: user.plan,
         planExpiresAt: user.planExpiresAt,
+        streak: {
+            current: streak,
+            longest: user.longestStreak,
+            lastDate: user.lastStreakUpdate,
+        },
     };
 }
 

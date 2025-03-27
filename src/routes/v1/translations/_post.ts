@@ -15,11 +15,7 @@ router.post(
     // @ts-ignore
     async (req: ExtendedRequest, res) => {
         try {
-            if (req.user.plan == "FREE") {
-                return res
-                    .status(402)
-                    .json({ message: "Upgrade to use this feature" });
-            }
+            // The scenarios tab requires translations to be enabled, so we can't check for the user's subscription here
 
             const { text, fromLanguage, toLanguage } = req.body;
 
