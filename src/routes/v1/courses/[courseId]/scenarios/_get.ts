@@ -1,3 +1,6 @@
+// GET /v1/courses/:courseId/scenarios
+// Get all scenarios for a course
+
 import { Response } from "express";
 import { ExtendedRequest } from "../../../../../types/request";
 import { getDialogueThemes } from "../../../../../db/redis/sections";

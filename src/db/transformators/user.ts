@@ -4,9 +4,9 @@
 import { Course, Section, User } from "@prisma/client";
 
 export function toAuthUser(user: User) {
-    // Streak expires after 36 hours of inactivity
+    // Streak expires after 25 hours of inactivity
     const streak =
-        (user.lastStreakUpdate?.getTime() ?? 0) + 36 * 60 * 60 * 1000 >
+        (user.lastStreakUpdate?.getTime() ?? 0) + 25 * 60 * 60 * 1000 >
         Date.now()
             ? user.currentStreak
             : 0;

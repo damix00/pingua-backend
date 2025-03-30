@@ -28,7 +28,7 @@ export default async (req: ExtendedRequest, res: Response) => {
             });
         }
 
-        // Get all scenarios for the course
+        // Get the scenario session
         const scenario = await prisma.aIScenario.findFirst({
             where: {
                 id: sessionId,
@@ -126,8 +126,12 @@ export default async (req: ExtendedRequest, res: Response) => {
 
         if (newAiMessage.done) {
             const shouldUpdateStreak =
+                // if not the same day and less than 25 hours since last streak update
                 !req.user.lastStreakUpdate ||
-                req.user.lastStreakUpdate.getDate() == new Date().getDate() - 1;
+                (req.user.lastStreakUpdate.getTime() + 25 * 60 * 60 * 1000 <
+                    Date.now() &&
+                    new Date().getDate() !==
+                        req.user.lastStreakUpdate.getDate());
 
             let streakUpdated = false;
 
