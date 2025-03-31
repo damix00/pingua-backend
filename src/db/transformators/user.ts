@@ -4,12 +4,14 @@
 import { Course, Section, User } from "@prisma/client";
 
 export function toAuthUser(user: User) {
-    // Streak expires after 25 hours of inactivity
-    const streak =
-        (user.lastStreakUpdate?.getTime() ?? 0) + 25 * 60 * 60 * 1000 >
-        Date.now()
+    // Streak expires after 25 hours of inactivity and if it isn't the same day
+    const streak = user.lastStreakUpdate
+        ? new Date(user.lastStreakUpdate).getTime() + 25 * 60 * 60 * 1000 >
+              Date.now() &&
+          new Date(user.lastStreakUpdate).getDate() === new Date().getDate()
             ? user.currentStreak
-            : 0;
+            : 0
+        : 0;
 
     return {
         id: user.id,

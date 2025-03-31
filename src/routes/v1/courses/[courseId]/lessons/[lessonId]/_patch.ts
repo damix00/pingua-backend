@@ -201,30 +201,28 @@ router.patch(
                     new Date().getDate() !==
                         req.user.lastStreakUpdate.getDate());
 
-            let streakUpdated = false;
+            const currentStreak =
+                (req.user.currentStreak ?? 0) + (shouldUpdateStreak ? 1 : 0);
 
-            if (shouldUpdateStreak) {
-                await prisma.user.update({
-                    where: {
-                        id: req.user.id,
-                    },
-                    data: {
-                        lastStreakUpdate: new Date(),
-                        currentStreak: (req.user.currentStreak ?? 0) + 1,
-                        longestStreak: Math.max(
-                            req.user.longestStreak ?? 0,
-                            (req.user.currentStreak ?? 0) + 1
-                        ),
-                    },
-                });
-                streakUpdated = true;
-            }
+            await prisma.user.update({
+                where: {
+                    id: req.user.id,
+                },
+                data: {
+                    lastStreakUpdate: new Date(),
+                    currentStreak: currentStreak,
+                    longestStreak: Math.max(
+                        req.user.longestStreak ?? 0,
+                        currentStreak
+                    ),
+                },
+            });
 
             res.status(200).json({
                 message: "Lesson completed",
                 xp,
                 advancedToNextSection,
-                updatedStreak: streakUpdated,
+                updatedStreak: shouldUpdateStreak,
             });
         } catch (error) {
             console.error(error);

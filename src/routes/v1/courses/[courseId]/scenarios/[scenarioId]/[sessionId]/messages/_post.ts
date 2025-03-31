@@ -133,24 +133,22 @@ export default async (req: ExtendedRequest, res: Response) => {
                     new Date().getDate() !==
                         req.user.lastStreakUpdate.getDate());
 
-            let streakUpdated = false;
+            const currentStreak =
+                (req.user.currentStreak ?? 0) + (shouldUpdateStreak ? 1 : 0);
 
-            if (shouldUpdateStreak) {
-                await prisma.user.update({
-                    where: {
-                        id: req.user.id,
-                    },
-                    data: {
-                        lastStreakUpdate: new Date(),
-                        currentStreak: (req.user.currentStreak ?? 0) + 1,
-                        longestStreak: Math.max(
-                            req.user.longestStreak ?? 0,
-                            (req.user.currentStreak ?? 0) + 1
-                        ),
-                    },
-                });
-                streakUpdated = true;
-            }
+            await prisma.user.update({
+                where: {
+                    id: req.user.id,
+                },
+                data: {
+                    lastStreakUpdate: new Date(),
+                    currentStreak: currentStreak,
+                    longestStreak: Math.max(
+                        req.user.longestStreak ?? 0,
+                        currentStreak
+                    ),
+                },
+            });
 
             await prisma.aIScenario.update({
                 where: {
@@ -169,7 +167,7 @@ export default async (req: ExtendedRequest, res: Response) => {
                     completed: true,
                     success: newAiMessage.success,
                 },
-                updatedStreak: streakUpdated,
+                updatedStreak: shouldUpdateStreak,
             });
 
             return;
