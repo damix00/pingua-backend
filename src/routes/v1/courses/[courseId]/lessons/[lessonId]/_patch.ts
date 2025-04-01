@@ -193,13 +193,14 @@ router.patch(
                 },
             });
 
+            const lastUpdate = req.user.lastStreakUpdate
+                ? new Date(req.user.lastStreakUpdate)
+                : null;
+
             const shouldUpdateStreak =
-                // if less than 25 hours since last streak update and day is not the same
-                !req.user.lastStreakUpdate ||
-                (req.user.lastStreakUpdate.getTime() + 25 * 60 * 60 * 1000 <
-                    Date.now() &&
-                    new Date().getDate() !=
-                        req.user.lastStreakUpdate.getDate());
+                !lastUpdate ||
+                (lastUpdate.getTime() + 25 * 60 * 60 * 1000 > Date.now() &&
+                    new Date().getDay() !== lastUpdate.getDay());
 
             const currentStreak =
                 (req.user.currentStreak ?? 0) + (shouldUpdateStreak ? 1 : 0);
