@@ -24,7 +24,7 @@ export async function translate(
     // If the AI just responded with the translation, it could be vulnerable to prompt injection
     // And without the function it doesn't want to translate anything remotely vulgar
     const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         tools: [
             {
                 type: "function",
@@ -190,7 +190,7 @@ const comparisonSchema = z.object({
 // Compare two texts to see if they are similar - for the audio task
 export async function compareTextsAudio(text1: string, text2: string) {
     const data = await openai.beta.chat.completions.parse({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
             {
                 role: "system",
@@ -220,7 +220,7 @@ export async function compareTranslatedTexts(
     toLanguage: string
 ) {
     const data = await openai.beta.chat.completions.parse({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
             {
                 role: "system",

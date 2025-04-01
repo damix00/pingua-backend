@@ -26,7 +26,7 @@ router.post(
             const translation = await getTranslation(
                 text,
                 toLanguage,
-                "gpt-4o-mini",
+                "gpt-4o",
                 fromLanguage
             );
 

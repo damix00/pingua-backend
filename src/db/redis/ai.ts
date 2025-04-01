@@ -55,7 +55,7 @@ export async function setTranslation(
 export async function getTranslation(
     text: string,
     toLanguage: string,
-    model: string = "gpt-4o-mini",
+    model: string = "gpt-4o",
     fromLanguage: string = "en"
 ) {
     // Try to get the cached translation from Redis

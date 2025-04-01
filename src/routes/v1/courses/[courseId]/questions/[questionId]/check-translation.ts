@@ -98,7 +98,7 @@ export default async (req: ExtendedRequest, res: Response) => {
             translation = await getTranslation(
                 questionText,
                 course.appLanguageCode,
-                "gpt-4o-mini",
+                "gpt-4o",
                 "en"
             );
         }
