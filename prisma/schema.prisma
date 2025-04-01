@@ -38,6 +38,7 @@ model User {
   currentStreak    Int       @default(0)
   longestStreak    Int       @default(0)
   lastStreakUpdate DateTime?
+  freeScenariosStarted Int       @default(0) // Number of free scenarios used
 
   courses          Course[]
   aiConversations  AIConversation[]

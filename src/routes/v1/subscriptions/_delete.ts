@@ -13,11 +13,14 @@ export default async (req: ExtendedRequest, res: Response) => {
             return;
         }
 
-        const stripeResult = await stripe.subscriptions.cancel(
-            req.user.subscriptionId
-        );
-
-        console.log(stripeResult);
+        try {
+            const stripeResult = await stripe.subscriptions.cancel(
+                req.user.subscriptionId
+            );
+            console.log(stripeResult);
+        } catch (error) {
+            console.error("Error canceling subscription:", error);
+        }
 
         const result = await prisma.user.update({
             where: {

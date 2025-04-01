@@ -13,6 +13,12 @@ export default async (req: ExtendedRequest, res: Response) => {
 
         const course = req.courses.find((c) => c.id === courseId);
 
+        if (req.user.plan == "FREE" && req.user.freeScenariosStarted >= 1) {
+            return res.status(403).json({
+                message: "Free plan limit reached",
+            });
+        }
+
         if (!course) {
             return res.status(404).json({
                 message: "Course not found",
@@ -57,6 +63,18 @@ export default async (req: ExtendedRequest, res: Response) => {
                 userMessage: false,
             },
         });
+
+        if (req.user.plan == "FREE") {
+            await prisma.user.update({
+                where: {
+                    id: req.user.id,
+                },
+                data: {
+                    freeScenariosStarted:
+                        (req.user.freeScenariosStarted ?? 0) + 1,
+                },
+            });
+        }
 
         res.status(200).json({
             scenario: newScenario,
