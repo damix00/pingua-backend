@@ -2,6 +2,10 @@
 
 This is the backend for the Pingua project. It is built using **TypeScript** and **Express.js**, with a focus on scalability, real-time interaction, and AI-assisted learning.
 
+**For more information check the [mobile app repo](https://github.com/damix00/pingua-expo-app).**
+
+🥈 2nd Place in the national computer science competition in the Software Development category in Croatia, 2025.
+
 ## Tech Stack
 
 - **Language**: TypeScript  
