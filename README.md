@@ -78,3 +78,7 @@ npx prisma generate
 ```bash
 npm start
 ```
+
+## Contributing
+
+Open to contributions! If you have ideas to make language learning even more fun, open a PR or drop an issue.
